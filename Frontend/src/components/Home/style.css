@@ -1,0 +1,11 @@
+.container {
+    flex: 1;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .text {
+    font-size: 20px;
+    color: #6200ee;
+  }
+  
