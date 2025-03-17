@@ -6,6 +6,7 @@ import Perfil from './src/components/Perfil';
 import Chat from './src/components/Chat';
 import Agentes from './src/components/Agentes';
 import { Ionicons } from '@expo/vector-icons';
+import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 
 const Tab = createBottomTabNavigator();
 
@@ -19,16 +20,16 @@ export default function App() {
             if (route.name === 'Perfil') {
               iconName = 'person';
             } else if (route.name === 'Chat') {
-              iconName = 'person';
+              iconName = 'chatbubbles-outline';
             } else if (route.name === 'Agentes') {
-              iconName = 'person';
+              iconName = 'agent';
             } else if (route.name === 'Home') {
               iconName = 'home';
             }
             return <Ionicons name={iconName} size={size} color={color} />;
           },
-          tabBarActiveTintColor: '#6200ee',
-          tabBarInactiveTintColor: 'gray',
+          tabBarActiveTintColor: 'red',
+          tabBarInactiveTintColor: 'White',
         })}
       >
         <Tab.Screen name="Perfil" component={Perfil} />

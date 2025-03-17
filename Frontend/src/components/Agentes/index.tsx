@@ -4,7 +4,7 @@ import { View, Text, StyleSheet } from 'react-native';
 const Agentes = () => {
   return (
     <View style={styles.container}>
-      <Text>Chat</Text>
+      <Text>Chatbots disponíveis</Text>
     </View>
   );
 };
