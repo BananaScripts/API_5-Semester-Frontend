@@ -7,18 +7,19 @@ const bots = [
   { id: 'Bot02', image: require('../../../assets/bot02.png'), descricao: "Um database pode ser criado usando o aplicativo..."},
   { id: 'Bot03', image: require('../../../assets/bot03.png'), descricao: "No princípio criou Deus os céus e a terra. E a terra era sem forma e vazia; e havia trevas sobre a face do abismo;"},
   { id: 'Bot04', image: require('../../../assets/bot04.png'), descricao: "Alguma descrição para o Bot04"},
-  { id: 'Bot05', image: require('../../../assets/bot04.png'), descricao: "Exemplo de outro bot com uma descrição muito mais longa..."},
-  { id: 'Bot06', image: require('../../../assets/bot04.png'), descricao: "Este é mais um bot com descrição longa para testar a rolagem."},
+  { id: 'Bot05', image: require('../../../assets/bot01.png'), descricao: "Exemplo de outro bot com uma descrição muito mais longa..."},
+  { id: 'Bot06', image: require('../../../assets/bot03.png'), descricao: "Este é mais um bot com descrição longa para testar a rolagem."},
 ];
 
 const Home = () => {
   return (
     <View style={styles.container}>
       <Text style={styles.titulo}>
-        Bem-vindo/a de volta, <Text style={styles.userText}>usuário</Text>
+        Bem-vindo/a, <Text style={styles.userText}>usuário!</Text>
       </Text>
       
       <View style={styles.pesquisar}>
+
         <TextInput style={styles.input} placeholder="Pesquisar..." placeholderTextColor="#888" />
       </View>
 

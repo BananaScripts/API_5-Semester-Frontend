@@ -27,7 +27,7 @@ export const styles = StyleSheet.create({
     padding: 6,
   },
   userText: {
-    color: "#26a3ff",
+    color: "#92FFFF",
   },
   pesquisar: {
     flexDirection: "row",
