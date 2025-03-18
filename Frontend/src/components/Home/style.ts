@@ -55,17 +55,17 @@ export const styles = StyleSheet.create({
     justifyContent: "center",
   },
   containerChats: {
-    flexDirection: "row", 
-    justifyContent: "space-between",
-    alignItems: "center", 
-    gap: 8, 
+    flexDirection: "row",
+    justifyContent: "flex-start",
+    alignItems: "center",
+    gap: 8,
     paddingHorizontal: 5,
   },
   agentesChats: {
     height: 130,
     width: 110,
     borderRadius: 8,
-    paddingTop: 6,
+    paddingTop: 15,
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: "#333333",
@@ -76,13 +76,15 @@ export const styles = StyleSheet.create({
     borderRadius: 10,
   },
   historico: {
-    height: 310, 
     backgroundColor: "#121212",
     borderColor: "#9182FF",
     borderRadius: 8,
     borderWidth: 1,
     padding: 10,
     justifyContent: "center",
+  },
+  scrollContainer: {
+    maxHeight: 250,
   },
   containerHistorico: {
     flexDirection: "column", 
@@ -94,17 +96,21 @@ export const styles = StyleSheet.create({
   agentesHistorico: {
     height: 65,
     width: "95%",
-    flexDirection: 'column',
+    flexDirection: 'row',  
     borderRadius: 8,
     padding: 7,
     backgroundColor: "#333333",
+    alignItems: "center",  
+    gap: 10,
   },
   imagemBotsHistorico: {
-    height: 35,
-    width: 35,
+    height: 40,
+    width: 40,
     borderRadius: 10,
   },
-  agenteDescricao: {
-    color: 'red',
-  }
+  botInfo: {
+    flexDirection: "column", 
+    justifyContent: "center",
+    width: 300,
+  },
 });
