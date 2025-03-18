@@ -1,2 +1,9 @@
 # API_5-Semester-Frontend
-Repository where we are adding the versions of the API (Integrated Project-Based Learning) project that we developed in the 5th Semester of DSM, at Fatec in SJC, SP.
+
+## Para rodar o frontend:
+
+- Entrar na pasta Frontend e rodar esses comandos:
+
+npm install
+npx expo start
+

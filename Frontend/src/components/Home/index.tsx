@@ -1,20 +1,19 @@
-import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import React from "react";
+import { View, Text, TextInput } from "react-native";
+import { styles } from "./style"; 
 
 const Home = () => {
   return (
     <View style={styles.container}>
-      <Text>Bem vindo/a de volta!</Text>
+      <Text style={styles.welcomeText}>
+        Bem vindo/a de volta, <Text style={styles.userText}>usuário</Text>
+      </Text>
+      
+      <View style={styles.searchContainer}>
+        <TextInput style={styles.input} placeholder="Pesquisar..." placeholderTextColor="#888" />
+      </View>
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center', 
-    alignItems: 'center',      
-  },
-});
 
 export default Home;
