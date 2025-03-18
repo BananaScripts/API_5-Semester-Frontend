@@ -60,7 +60,7 @@ const styles = StyleSheet.create({
   tabBar: {
     display: 'flex',
     position: "absolute",
-    borderRadius: 20,
+    borderRadius: 8,
     backgroundColor: "#121212",
     borderWidth: 1,
     borderColor: "#26a3ff", 
