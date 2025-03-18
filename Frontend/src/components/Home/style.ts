@@ -60,6 +60,7 @@ export const styles = StyleSheet.create({
     alignItems: "center",
     gap: 8,
     paddingHorizontal: 5,
+    paddingBottom: 10,
   },
   agentesChats: {
     height: 130,
