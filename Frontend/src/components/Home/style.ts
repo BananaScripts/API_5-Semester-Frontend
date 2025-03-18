@@ -6,14 +6,19 @@ export const styles = StyleSheet.create({
     backgroundColor: "#000",
     padding: 10,
   },
-  welcomeText: {
+  titulo: {
     color: "#fff",
     fontSize: 24,
+  },
+  subtitulo: {
+    color: "#fff",
+    fontSize: 15,
+    padding: 10,
   },
   userText: {
     color: "#26a3ff",
   },
-  searchContainer: {
+  pesquisar: {
     flexDirection: "row",
     alignItems: "center",
     backgroundColor: "#111",
@@ -34,4 +39,16 @@ export const styles = StyleSheet.create({
     fontSize: 18,
     marginVertical: 10,
   },
+  chats: {
+    height: 150,
+    backgroundColor: "#121212",
+    borderColor: "#FC82FF",
+    borderRadius: 8,
+    borderWidth: 1,
+  },
+  agentesChats: {
+    height: 100,
+    backgroundColor: 'red',
+
+  }
 });

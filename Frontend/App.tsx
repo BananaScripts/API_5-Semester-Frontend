@@ -35,7 +35,7 @@ export default function App() {
                 <Ionicons
                   name={iconName}
                   size={size}
-                  color={focused ? "#26a3ff" : "gray"}
+                  color={focused ? "#26a3ff" : "white"}
                   style={focused ? styles.activeIcon : {}}
                 />
                 {focused && <View style={styles.activeGlow} />}
