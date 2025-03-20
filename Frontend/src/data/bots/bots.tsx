@@ -1,26 +1,25 @@
-export const bots = [
-    { id: 'Bot01', image: require('../../../assets/bot01.png'), descricao: "Tente entrar em contato com a assistência técnica pelo número...", category: 'faq' },
-    { id: 'Bot02', image: require('../../../assets/bot02.png'), descricao: "Um database pode ser criado usando o aplicativo...", category: 'tutorial' },
-    { id: 'Bot03', image: require('../../../assets/bot03.png'), descricao: "No princípio criou Deus os céus e a terra. E a terra era sem forma e vazia; e havia trevas sobre a face do abismo;", category: 'faq' },
-    { id: 'Bot04', image: require('../../../assets/bot04.png'), descricao: "Alguma descrição para o Bot04", category: 'chatbot' },
-    { id: 'Bot05', image: require('../../../assets/bot01.png'), descricao: "Exemplo de outro bot com uma descrição muito mais longa...", category: 'tutorial' },
-    { id: 'Bot06', image: require('../../../assets/bot03.png'), descricao: "Este é mais um bot com descrição longa para testar a rolagem.", category: 'faq' },
-    { id: 'Bot07', image: require('../../../assets/bot02.png'), descricao: "Este é mais um bot com descrição longa para testar a rolagem.", category: 'tutorial' },
-    { id: 'Bot08', image: require('../../../assets/bot04.png'), descricao: "Este é mais um bot com descrição longa para testar a rolagem.", category: 'chatbot' },
-    { id: 'Bot09', image: require('../../../assets/bot01.png'), descricao: "Prepare-se para o duelo! Este bot pode te ajudar com dicas de Yu-Gi-Oh!", category: 'faq' },
-    { id: 'Bot10', image: require('../../../assets/bot02.png'), descricao: "Você morreu. Este bot tem todas as dicas para sobreviver em Dark Souls.", category: 'tutorial' },
-    { id: 'Bot11', image: require('../../../assets/bot03.png'), descricao: "A jornada de um herói começa aqui. Este bot tem informações sobre os melhores RPGs.", category: 'faq' },
-    { id: 'Bot12', image: require('../../../assets/bot04.png'), descricao: "Este bot é um mestre em estratégias de jogos de tabuleiro.", category: 'chatbot' },
-    { id: 'Bot13', image: require('../../../assets/bot01.png'), descricao: "Quer saber mais sobre os animes da temporada? Este bot tem todas as novidades.", category: 'faq' },
-    { id: 'Bot14', image: require('../../../assets/bot02.png'), descricao: "Este bot pode te ajudar a montar o melhor deck em Yu-Gi-Oh!", category: 'tutorial' },
-    { id: 'Bot15', image: require('../../../assets/bot03.png'), descricao: "Descubra os segredos de Lordran com este bot especialista em Dark Souls.", category: 'faq' },
+export const bots: Bot[] = [
+    { id: 'Bot01', image: require('../../../assets/bot01.png'), descricao: "Este bot inverte o texto que você envia.", category: 'faq', response: (message: string) => message.split('').reverse().join('') },
+    { id: 'Bot02', image: require('../../../assets/bot02.png'), descricao: "Este bot conta o número de letras na sua mensagem.", category: 'tutorial', response: (message: string) => `Sua mensagem tem ${message.length} letras.` },
+    { id: 'Bot03', image: require('../../../assets/bot03.png'), descricao: "Este bot converte sua mensagem para maiúsculas.", category: 'faq', response: (message: string) => message.toUpperCase() },
+    { id: 'Bot04', image: require('../../../assets/bot04.png'), descricao: "Este bot converte sua mensagem para minúsculas.", category: 'chatbot', response: (message: string) => message.toLowerCase() },
+    { id: 'Bot05', image: require('../../../assets/bot01.png'), descricao: "Este bot repete sua mensagem duas vezes.", category: 'tutorial', response: (message: string) => `${message} ${message}` },
+    { id: 'Bot06', image: require('../../../assets/bot03.png'), descricao: "Este bot adiciona um ponto de exclamação no final da sua mensagem.", category: 'faq', response: (message: string) => `${message}!` },
+    { id: 'Bot07', image: require('../../../assets/bot02.png'), descricao: "Este bot adiciona um ponto de interrogação no final da sua mensagem.", category: 'tutorial', response: (message: string) => `${message}?` },
+    { id: 'Bot08', image: require('../../../assets/bot04.png'), descricao: "Este bot substitui espaços por hífens na sua mensagem.", category: 'chatbot', response: (message: string) => message.replace(/ /g, '-') },
+    { id: 'Bot09', image: require('../../../assets/bot01.png'), descricao: "Este bot conta o número de palavras na sua mensagem.", category: 'faq', response: (message: string) => `Sua mensagem tem ${message.split(' ').length} palavras.` },
+    { id: 'Bot10', image: require('../../../assets/bot02.png'), descricao: "Este bot adiciona 'Olá!' no início da sua mensagem.", category: 'tutorial', response: (message: string) => `Olá! ${message}` },
+    { id: 'Bot11', image: require('../../../assets/bot03.png'), descricao: "Este bot adiciona 'Adeus!' no final da sua mensagem.", category: 'faq', response: (message: string) => `${message} Adeus!` },
+    { id: 'Bot12', image: require('../../../assets/bot04.png'), descricao: "Este bot converte sua mensagem para camelCase.", category: 'chatbot', response: (message: string) => message.replace(/(?:^\w|[A-Z]|\b\w|\s+)/g, (match, index) => index === 0 ? match.toLowerCase() : match.toUpperCase()).replace(/\s+/g, '') },
+    { id: 'Bot13', image: require('../../../assets/bot01.png'), descricao: "Este bot converte sua mensagem para snake_case.", category: 'faq', response: (message: string) => message.replace(/\s+/g, '_').toLowerCase() },
+    { id: 'Bot14', image: require('../../../assets/bot02.png'), descricao: "Este bot converte sua mensagem para kebab-case.", category: 'tutorial', response: (message: string) => message.replace(/\s+/g, '-').toLowerCase() },
+    { id: 'Bot15', image: require('../../../assets/bot03.png'), descricao: "Este bot converte sua mensagem para PascalCase.", category: 'faq', response: (message: string) => message.replace(/\w\S*/g, (txt) => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase()).replace(/\s+/g, '') },
   ];
-
-  type Bot = {
+  
+  export type Bot = {
     id: string;
     descricao: string;
     category: string;
     image: any;
+    response: (message: string) => string;
   };
-
-  export { Bot };

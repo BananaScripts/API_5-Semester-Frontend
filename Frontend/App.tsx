@@ -42,7 +42,7 @@ export default function App() {
     <NavigationContainer>
       <Stack.Navigator>
         <Stack.Screen name="Main" component={MainTabs} options={{ headerShown: false }} />
-        <Stack.Screen name="ChatScreen" component={(props) => <ChatScreen {...props} />} options={{ title: 'Chat' }} />
+        <Stack.Screen name="ChatScreen" component={ChatScreen} options={{ headerShown: false }} />
       </Stack.Navigator>
     </NavigationContainer>
   );
@@ -75,9 +75,6 @@ function MainTabs() {
                   height={size + 10}
                   style={{ color: focused ? borderColor : "white" }} 
                 />
-                {focused && (
-                  <View style={[{ backgroundColor: borderColor }]} />
-                )}
               </View>
             );
           },
