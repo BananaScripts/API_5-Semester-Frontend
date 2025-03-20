@@ -14,10 +14,13 @@
     "resolveJsonModule": true,
     "jsx": "react-jsx",
     "esModuleInterop": true,
-    "forceConsistentCasingInFileNames": true
+    "forceConsistentCasingInFileNames": true,
+    "allowSyntheticDefaultImports": true // Add this line
   },
   "include": [
-    "src"
+    "src",
+    "declarations.d.ts",
+    "svg.d.ts" // Add this line to include the SVG declaration file
   ],
   "exclude": [
     "node_modules"

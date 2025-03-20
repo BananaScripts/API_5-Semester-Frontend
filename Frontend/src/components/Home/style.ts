@@ -9,25 +9,32 @@ export const styles = StyleSheet.create({
   },
   titulo: {
     color: "#fff",
-    fontSize: 24,
+    fontSize: 30,
+    paddingTop: "15%",
+    paddingBottom: "5%",
+    fontFamily: 'JetBrainsMono',
   },
   subtitulo: {
     color: "#fff",
     fontSize: 15,
     padding: 10,
+    fontFamily: 'JetBrainsMono',
   },
   subtitulo2: {
     color: "#fff",
     fontSize: 12,
     padding: 10,
+    fontFamily: 'JetBrainsMono',
   },
   subtitulo3: {
     color: "#fff",
-    fontSize: 9,
-    padding: 6,
+    fontSize: 10,
+    padding: 2,
+    fontFamily: 'JetBrainsMono',
   },
   userText: {
     color: "#92FFFF",
+    fontFamily: 'JetBrainsMono',
   },
   pesquisar: {
     flexDirection: "row",
@@ -38,12 +45,14 @@ export const styles = StyleSheet.create({
     marginVertical: 10,
     borderWidth: 1,
     borderColor: "#26a3ff",
+    fontFamily: 'JetBrainsMono',
   },
   input: {
     flex: 1,
     color: "#fff",
     padding: 5,
     fontSize: 16,
+    fontFamily: 'JetBrainsMono',
   },
   chats: {
     height: 190, 
@@ -53,6 +62,7 @@ export const styles = StyleSheet.create({
     borderWidth: 1,
     padding: 10,
     justifyContent: "center",
+    fontFamily: 'JetBrainsMono',
   },
   containerChats: {
     flexDirection: "row",
@@ -61,6 +71,7 @@ export const styles = StyleSheet.create({
     gap: 8,
     paddingHorizontal: 5,
     paddingBottom: 10,
+    fontFamily: 'JetBrainsMono',
   },
   agentesChats: {
     height: 130,
@@ -70,6 +81,7 @@ export const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: "#333333",
+    fontFamily: 'JetBrainsMono',
   },
   imagemBots: {
     height: 95,
@@ -83,6 +95,7 @@ export const styles = StyleSheet.create({
     borderWidth: 1,
     padding: 10,
     justifyContent: "center",
+    fontFamily: 'JetBrainsMono',
   },
   scrollContainer: {
     maxHeight: 250,
@@ -93,6 +106,7 @@ export const styles = StyleSheet.create({
     alignItems: "center", 
     gap: 8, 
     paddingHorizontal: 5,
+    fontFamily: 'JetBrainsMono',
   },
   agentesHistorico: {
     height: 65,
@@ -103,6 +117,7 @@ export const styles = StyleSheet.create({
     backgroundColor: "#333333",
     alignItems: "center",  
     gap: 10,
+    fontFamily: 'JetBrainsMono',
   },
   imagemBotsHistorico: {
     height: 40,
@@ -113,5 +128,6 @@ export const styles = StyleSheet.create({
     flexDirection: "column", 
     justifyContent: "center",
     width: 300,
+    fontFamily: 'JetBrainsMono',
   },
 });

@@ -1,55 +1,80 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { NavigationContainer } from "@react-navigation/native";
-import { Ionicons } from "@expo/vector-icons";
-import { View, Text, StyleSheet } from "react-native";
-import LinearGradient from 'react-native-linear-gradient'; 
+import * as Font from 'expo-font';
+import AppLoading from 'expo-app-loading';
+import { View, StyleSheet } from "react-native";
 
 import Home from "./src/components/Home";
 import Perfil from "./src/components/Perfil";
 import Agentes from "./src/components/Agentes";
 import Chat from "./src/components/Chat";
 
+import HomeIcon from './assets/icons/home.svg';
+import PerfilIcon from './assets/icons/profile.svg';
+import AgentesIcon from './assets/icons/bots.svg';
+import ChatIcon from './assets/icons/chat.svg';
+
 const Tab = createBottomTabNavigator();
 
 export default function App() {
+  const [fontLoaded, setFontLoaded] = useState(false);
+
+  const loadFonts = async () => {
+    await Font.loadAsync({
+      'JetBrainsMono': require('./assets/fonts/JetBrainsMono.ttf'),
+    });
+    setFontLoaded(true);
+  };
+
+  useEffect(() => {
+    loadFonts();
+  }, []);
+
+  if (!fontLoaded) {
+    return <AppLoading />;
+  }
+
   return (
     <NavigationContainer>
       <Tab.Navigator
-        screenOptions={({ route }) => ({
-          tabBarIcon: ({ focused, color, size }) => {
-            let iconName;
+        screenOptions={({ route }) => {
+          const borderColor = {
+            "Perfil": "#92FFFF",
+            "Chat": "#FC82FF",
+            "Agentes": "#9182FF",
+            "Home": "#92FFFF",
+          }[route.name] || "white";
 
-            if (route.name === "Perfil") {
-              iconName = "person-outline";
-            } else if (route.name === "Chat") {
-              iconName = "chatbubbles-outline";
-            } else if (route.name === "Agentes") {
-              iconName = "person";
-            } else if (route.name === "Home") {
-              iconName = "home-outline";
-            }
+          return {
+            tabBarIcon: ({ focused, size }) => {
+              const IconComponent = {
+                "Perfil": PerfilIcon,
+                "Agentes": ChatIcon,
+                "Chat": AgentesIcon, 
+                "Home": HomeIcon,
+              }[route.name];
 
-            return (
-              <View style={styles.iconContainer}>
-                <Ionicons
-                  name={iconName}
-                  size={size}
-                  color={focused ? "#26a3ff" : "white"}
-                  style={focused ? styles.activeIcon : {}}
-                />
-                {focused && <View style={styles.activeGlow} />}
-              </View>
-            );
-          },
-          tabBarStyle: styles.tabBar,
-          tabBarShowLabel: false,
-          headerShown: false,
-        })}
+              return (
+                <View style={styles.iconContainer}>
+                  <IconComponent
+                    width={size + 10}
+                    height={size + 10}
+                    style={{ fill: focused ? borderColor : "none" }} 
+                  />
+                  {focused && <View style={[styles.activeGlow, { backgroundColor: borderColor }]} />}
+                </View>
+              );
+            },
+            tabBarStyle: [styles.tabBar, { borderColor }],
+            tabBarShowLabel: false,
+            headerShown: false,
+          };
+        }}
       >
         <Tab.Screen name="Perfil" component={Perfil} />
-        <Tab.Screen name="Chat" component={Chat} />
         <Tab.Screen name="Agentes" component={Agentes} />
+        <Tab.Screen name="Chat" component={Chat} />
         <Tab.Screen name="Home" component={Home} />
       </Tab.Navigator>
     </NavigationContainer>
@@ -62,22 +87,22 @@ const styles = StyleSheet.create({
     position: "absolute",
     borderRadius: 8,
     backgroundColor: "#121212",
-    borderWidth: 1,
-    borderColor: "#26a3ff", 
+    borderWidth: 2, 
     elevation: 5,
     shadowColor: "#26a3ff",
     shadowOpacity: 0.5,
     shadowRadius: 10,
     shadowOffset: { width: 0, height: 5 },
+    height: 70,
+    justifyContent: 'center', 
+    alignItems: 'center',
+    paddingTop: 10, 
   },
   iconContainer: {
     alignItems: "center",
     justifyContent: "center",
-  },
-  activeIcon: {
-    textShadowColor: "#26a3ff",
-    textShadowOffset: { width: 0, height: 0 },
-    textShadowRadius: 8,
+    height: "100%",
+    paddingBottom: 10, 
   },
   activeGlow: {
     position: "absolute",
@@ -85,11 +110,5 @@ const styles = StyleSheet.create({
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: "#26a3ff",
-    // backgroundColor: "linear-gradient(207deg, rgba(252,130,255,1) 13%, rgba(145,130,255,1) 51%, rgba(146,255,255,1) 91%);", 
-  },
-  gradientTabBar: {
-    flex: 1,
-    borderRadius: 20,
   },
 });

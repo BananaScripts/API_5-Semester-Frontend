@@ -1,4 +1,3 @@
-
 import { StyleSheet } from "react-native";
 
 export const styles = StyleSheet.create({
@@ -6,63 +5,96 @@ export const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#000",
     padding: 10,
-    gap: 10,
   },
   titulo: {
     color: "#fff",
     fontSize: 24,
+    paddingTop: "15%",
+    paddingBottom: "5%",
+    fontFamily: 'JetBrainsMono',
   },
-  subtitulo: {
-    color: "#fff",
-    fontSize: 20,
-    padding: 10,
-  },
-  subtitulo2: {
-    color: "#fff",
-    fontSize: 12,
-    padding: 10,
-  },
-  subtitulo3: {
-    color: "#fff",
-    fontSize: 9,
-    padding: 6,
-  },
-  historico: {
-    backgroundColor: "#121212",
-    borderColor: "#9182FF",
+  searchAndTagsWrapper: {
+    backgroundColor: "#1a1a1a",
     borderRadius: 8,
     borderWidth: 1,
+    borderColor: "#FC82FF",
+    marginBottom: 10,
     padding: 10,
-    justifyContent: "center",
+  },
+  searchAndTagsContainer: {
+    marginBottom: 10,
+  },
+  input: {
+    color: "#fff",
+    backgroundColor: "#333",
+    padding: 10,
+    borderRadius: 8,
+    marginBottom: 10,
+    fontFamily: 'JetBrainsMono',
+  },
+  tagContainer: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    marginBottom: 10,
+  },
+  tag: {
+    backgroundColor: "#333",
+    padding: 10,
+    borderRadius: 8,
+    marginRight: 10,
+    marginBottom: 10,
+  },
+  selectedTag: {
+    backgroundColor: "#FC82FF",
+  },
+  tagText: {
+    color: "#fff",
+    fontFamily: 'JetBrainsMono',
+  },
+  botsWrapper: {
+    flex: 1,
+    backgroundColor: "#1a1a1a",
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: "#FC82FF",
+    padding: 10,
   },
   scrollContainer: {
-    maxHeight: 1400,
+    flex: 1,
   },
-  containerHistorico: {
-    flexDirection: "column", 
-    justifyContent: "center",
-    alignItems: "center", 
-    gap: 8, 
-    paddingHorizontal: 5,
+  scrollContent: {
+    paddingBottom: 20,
   },
-  agentesHistorico: {
-    height: 90,
-    width: "100%",
-    flexDirection: 'row',  
+  gridContainer: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "space-between",
+  },
+  botCard: {
+    width: "48%",
+    backgroundColor: "#333",
     borderRadius: 8,
-    padding: 7,
-    backgroundColor: "#333333",
-    alignItems: "center",  
-    gap: 10,
+    marginBottom: 10,
+    padding: 10,
   },
-  imagemBotsHistorico: {
-    height: 70,
-    width: 70,
-    borderRadius: 10,
+  botImage: {
+    width: "100%",
+    height: 100,
+    borderRadius: 8,
+    marginBottom: 10,
   },
   botInfo: {
-    flexDirection: "column", 
-    justifyContent: "center",
-    width: 275,
+    alignItems: "center",
+  },
+  botTitle: {
+    color: "#fff",
+    fontSize: 16,
+    fontFamily: 'JetBrainsMono',
+    marginBottom: 5,
+  },
+  botDescription: {
+    color: "#fff",
+    fontSize: 12,
+    fontFamily: 'JetBrainsMono',
   },
 });

@@ -15,7 +15,7 @@ const Home = () => {
   return (
     <View style={styles.container}>
       <Text style={styles.titulo}>
-        Bem-vindo/a, <Text style={styles.userText}>usuário!</Text>
+        Bem-vindo/a de volta, <Text style={styles.userText}>usuário!</Text>
       </Text>
       
       <View style={styles.pesquisar}>

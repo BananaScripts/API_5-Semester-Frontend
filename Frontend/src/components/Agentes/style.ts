@@ -11,6 +11,7 @@ export const styles = StyleSheet.create({
     fontSize: 24,
     textAlign: "center",
     marginVertical: 20,
+    fontFamily: 'JetBrainsMono',
   },
 });
 
