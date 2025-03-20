@@ -60,7 +60,7 @@ export default function App() {
                   <IconComponent
                     width={size + 10}
                     height={size + 10}
-                    style={{ fill: focused ? borderColor : "none" }} 
+                    style={{ color: focused ? borderColor : "white" }} // Change color dynamically
                   />
                   {focused && <View style={[styles.activeGlow, { backgroundColor: borderColor }]} />}
                 </View>
