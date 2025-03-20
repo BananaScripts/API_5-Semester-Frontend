@@ -44,7 +44,7 @@ export const styles = StyleSheet.create({
     borderRadius: 8,
     marginVertical: 10,
     borderWidth: 1,
-    borderColor: "#26a3ff",
+    borderColor: "#92FFFF",
     fontFamily: 'JetBrainsMono',
   },
   input: {

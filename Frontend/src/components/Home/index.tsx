@@ -1,17 +1,32 @@
-import React from "react";
-import { View, Text, TextInput, Image, ScrollView } from "react-native";
+import React, { useState } from "react";
+import { View, Text, TextInput, Image, ScrollView, TouchableOpacity } from "react-native";
+import { useNavigation, NavigationProp } from '@react-navigation/native';
 import { styles } from "./style"; 
-
-const bots = [
-  { id: 'Bot01', image: require('../../../assets/bot01.png'), descricao: "Tente entrar em contato com a assistência técnica pelo número..."},
-  { id: 'Bot02', image: require('../../../assets/bot02.png'), descricao: "Um database pode ser criado usando o aplicativo..."},
-  { id: 'Bot03', image: require('../../../assets/bot03.png'), descricao: "No princípio criou Deus os céus e a terra. E a terra era sem forma e vazia; e havia trevas sobre a face do abismo;"},
-  { id: 'Bot04', image: require('../../../assets/bot04.png'), descricao: "Alguma descrição para o Bot04"},
-  { id: 'Bot05', image: require('../../../assets/bot01.png'), descricao: "Exemplo de outro bot com uma descrição muito mais longa..."},
-  { id: 'Bot06', image: require('../../../assets/bot03.png'), descricao: "Este é mais um bot com descrição longa para testar a rolagem."},
-];
+import { bots } from "../../data/bots/bots";
+import { RootStackParamList, Bot } from '../../data/types/types'; 
 
 const Home = () => {
+  const [searchText, setSearchText] = useState("");
+  const [filteredBots, setFilteredBots] = useState(bots);
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+
+  const handleSearch = (text: string) => {
+    setSearchText(text);
+    filterBots(text);
+  };
+
+  const filterBots = (text: string) => {
+    const filtered = bots.filter(bot => 
+      bot.id.toLowerCase().includes(text.toLowerCase()) || 
+      bot.descricao.toLowerCase().includes(text.toLowerCase())
+    );
+    setFilteredBots(filtered);
+  };
+
+  const handleBotPress = (bot: Bot) => {
+    navigation.navigate('ChatScreen', { bot });
+  };
+
   return (
     <View style={styles.container}>
       <Text style={styles.titulo}>
@@ -19,8 +34,13 @@ const Home = () => {
       </Text>
       
       <View style={styles.pesquisar}>
-
-        <TextInput style={styles.input} placeholder="Pesquisar..." placeholderTextColor="#888" />
+        <TextInput 
+          style={styles.input} 
+          placeholder="Pesquisar..." 
+          placeholderTextColor="#888" 
+          value={searchText}
+          onChangeText={handleSearch}
+        />
       </View>
 
       <View style={styles.chats}>
@@ -28,11 +48,11 @@ const Home = () => {
 
         <ScrollView horizontal showsHorizontalScrollIndicator={false}>
           <View style={styles.containerChats}>
-            {bots.map((bot) => (
-              <View key={bot.id} style={styles.agentesChats}>
+            {filteredBots.map((bot) => (
+              <TouchableOpacity key={bot.id} style={styles.agentesChats} onPress={() => handleBotPress(bot)}>
                 <Image style={styles.imagemBots} source={bot.image} />
                 <Text style={styles.subtitulo2}>{bot.id}</Text>
-              </View>
+              </TouchableOpacity>
             ))}
           </View>
         </ScrollView>
@@ -43,14 +63,14 @@ const Home = () => {
         
         <ScrollView style={styles.scrollContainer}>
           <View style={styles.containerHistorico}>
-            {bots.map((bot) => (
-              <View key={bot.id} style={styles.agentesHistorico}>
+            {filteredBots.map((bot) => (
+              <TouchableOpacity key={bot.id} style={styles.agentesHistorico} onPress={() => handleBotPress(bot)}>
                 <Image style={styles.imagemBotsHistorico} source={bot.image} />
                 <View style={styles.botInfo}>
                   <Text style={styles.subtitulo3}>{bot.id}</Text>
                   <Text style={styles.subtitulo3}>{bot.descricao}</Text>
                 </View>
-              </View>
+              </TouchableOpacity>
             ))}
           </View>
         </ScrollView>
