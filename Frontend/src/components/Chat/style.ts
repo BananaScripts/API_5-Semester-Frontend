@@ -8,9 +8,9 @@ export const styles = StyleSheet.create({
   },
   titulo: {
     color: "#fff",
-    fontSize: 24,
-    paddingTop: "15%",
+    fontSize: 30,
     paddingBottom: "5%",
+    paddingTop: "10%",
     fontFamily: 'JetBrainsMono',
   },
   searchAndTagsWrapper: {
@@ -58,6 +58,7 @@ export const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#FC82FF",
     padding: 10,
+    paddingBottom: 30,
   },
   scrollContainer: {
     flex: 1,

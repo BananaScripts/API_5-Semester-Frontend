@@ -57,6 +57,7 @@ export const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 5,
     paddingHorizontal: 10,
+    fontFamily: 'JetBrainsMono',
     color: '#fff',
   },
   sendButton: {
@@ -64,7 +65,7 @@ export const styles = StyleSheet.create({
   },
   userMessage: {
     alignSelf: 'flex-end',
-    backgroundColor: '#1E90FF',
+    backgroundColor: '#9182FF',
     borderRadius: 10,
     padding: 10,
     marginVertical: 5,

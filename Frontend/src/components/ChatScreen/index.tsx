@@ -1,17 +1,23 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, Image, TextInput, TouchableOpacity, ScrollView } from 'react-native';
-import { useNavigation, RouteProp } from '@react-navigation/native';
+import { useNavigation, RouteProp, ParamListBase } from '@react-navigation/native';
 import { styles } from './style';
 import { Ionicons } from '@expo/vector-icons';
 import { Bot } from '../../data/bots/bots';
+import { useChatHistory } from '../../data/context/ChatHistoryContext';
 
-type ChatScreenRouteProp = RouteProp<{ params: { bot: Bot } }, 'params'>;
+type ChatScreenRouteProp = RouteProp<{ ChatScreen: { bot: Bot } }, 'ChatScreen'>;
 
 const ChatScreen = ({ route }: { route: ChatScreenRouteProp }) => {
   const { bot } = route.params;
   const navigation = useNavigation();
+  const { addChatToHistory } = useChatHistory();
   const [messages, setMessages] = useState<{ sender: string, text: string }[]>([]);
   const [inputText, setInputText] = useState('');
+
+  useEffect(() => {
+    addChatToHistory(bot);
+  }, [bot]);
 
   const handleSend = () => {
     if (inputText.trim()) {

@@ -10,7 +10,8 @@ import Home from "./src/components/Home";
 import Perfil from "./src/components/Perfil";
 import Agentes from "./src/components/Agentes";
 import Chat from "./src/components/Chat";
-import ChatScreen from "./src/components/ChatScreen/index.tsx"; 
+import ChatScreen from "./src/components/ChatScreen";
+import { ChatHistoryProvider } from "./src/data/context/ChatHistoryContext";
 
 import HomeIcon from './assets/icons/home.svg';
 import PerfilIcon from './assets/icons/profile.svg';
@@ -39,12 +40,14 @@ export default function App() {
   }
 
   return (
-    <NavigationContainer>
-      <Stack.Navigator>
-        <Stack.Screen name="Main" component={MainTabs} options={{ headerShown: false }} />
-        <Stack.Screen name="ChatScreen" component={ChatScreen} options={{ headerShown: false }} />
-      </Stack.Navigator>
-    </NavigationContainer>
+    <ChatHistoryProvider>
+      <NavigationContainer>
+        <Stack.Navigator>
+          <Stack.Screen name="Main" component={MainTabs} options={{ headerShown: false }} />
+          <Stack.Screen name="ChatScreen" component={(props) => <ChatScreen {...props} />} options={{ headerShown: false }} />
+        </Stack.Navigator>
+      </NavigationContainer>
+    </ChatHistoryProvider>
   );
 }
 
