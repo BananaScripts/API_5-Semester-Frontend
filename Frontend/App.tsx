@@ -12,6 +12,7 @@ import Agentes from './src/components/Agentes';
 import Chat from './src/components/Chat';
 import Login from './src/components/Login';
 import ChatScreen from "./src/components/ChatScreen/index.tsx"; 
+import { ChatHistoryProvider } from './src/data/context/ChatHistoryContext.tsx';
 
 import HomeIcon from './assets/icons/home.svg';
 import PerfilIcon from './assets/icons/profile.svg';
