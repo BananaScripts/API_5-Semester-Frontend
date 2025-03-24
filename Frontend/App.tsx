@@ -42,7 +42,7 @@ export default function App() {
   return (
     <ChatHistoryProvider>
       <NavigationContainer>
-        <Stack.Navigator>
+        <Stack.Navigator initialRouteName="Main">
           <Stack.Screen name="Main" component={MainTabs} options={{ headerShown: false }} />
           <Stack.Screen name="ChatScreen" component={(props) => <ChatScreen {...props} />} options={{ headerShown: false }} />
         </Stack.Navigator>
@@ -54,6 +54,7 @@ export default function App() {
 function MainTabs() {
   return (
     <Tab.Navigator
+      initialRouteName="Home" 
       screenOptions={({ route }) => {
         const borderColor = {
           "Perfil": "#92FFFF",
@@ -66,8 +67,8 @@ function MainTabs() {
           tabBarIcon: ({ focused, size }) => {
             const IconComponent = {
               "Perfil": PerfilIcon,
-              "Agentes": ChatIcon,
-              "Chat": AgentesIcon, 
+              "Agentes": AgentesIcon,
+              "Chat": ChatIcon,
               "Home": HomeIcon,
             }[route.name];
 
