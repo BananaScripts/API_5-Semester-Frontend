@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, Image, TextInput, TouchableOpacity, ScrollView } from 'react-native';
-import { useNavigation, RouteProp, ParamListBase } from '@react-navigation/native';
-import { styles } from './style';
 import { Ionicons } from '@expo/vector-icons';
+import { styles } from './style';
+import { RouteProp } from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 import { Bot } from '../../data/bots/bots';
 import { useChatHistory } from '../../data/context/ChatHistoryContext';
 
