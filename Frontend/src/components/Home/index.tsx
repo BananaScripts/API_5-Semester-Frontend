@@ -2,14 +2,15 @@ import React, { useState } from "react";
 import { View, Text, TextInput, Image, ScrollView, TouchableOpacity } from "react-native";
 import { useNavigation, NavigationProp } from '@react-navigation/native';
 import { styles } from "./style"; 
-import { bots } from "../../data/bots/bots";
-import { RootStackParamList, Bot } from '../../data/types/types'; 
+import { bots, Bot } from "../../data/bots/bots"; 
+import { RootStackParamList } from '../../data/types/types'; 
+import { useChatHistory } from '../../data/context/ChatHistoryContext';
 
 const Home = () => {
   const [searchText, setSearchText] = useState("");
-  const [filteredBots, setFilteredBots] = useState(bots);
+  const [filteredBots, setFilteredBots] = useState<Bot[]>(bots);
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
-
+  const { chatHistory } = useChatHistory(); 
   const handleSearch = (text: string) => {
     setSearchText(text);
     filterBots(text);
@@ -63,7 +64,7 @@ const Home = () => {
         
         <ScrollView style={styles.scrollContainer}>
           <View style={styles.containerHistorico}>
-            {filteredBots.map((bot) => (
+            {chatHistory.map((bot) => (
               <TouchableOpacity key={bot.id} style={styles.agentesHistorico} onPress={() => handleBotPress(bot)}>
                 <Image style={styles.imagemBotsHistorico} source={bot.image} />
                 <View style={styles.botInfo}>
