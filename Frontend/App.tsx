@@ -11,7 +11,7 @@ import Perfil from './src/components/Perfil';
 import Agentes from './src/components/Agentes';
 import Chat from './src/components/Chat';
 import Login from './src/components/Login';
-import ChatScreen from './src/components/ChatScreen';
+import ChatScreen from "./src/components/ChatScreen/index.tsx"; 
 
 import HomeIcon from './assets/icons/home.svg';
 import PerfilIcon from './assets/icons/profile.svg';
@@ -42,18 +42,8 @@ export default function App() {
   return (
     <NavigationContainer>
       <Stack.Navigator>
-        {/* A tela de Login é a primeira que aparece */}
-        <Stack.Screen
-          name="Login"
-          component={Login}
-          options={{ headerShown: false }}
-        />
-        {/* Depois que o login for feito, irá para as Tabs */}
-        <Stack.Screen
-          name="HomeTabs"
-          component={MainTabs}
-          options={{ headerShown: false }}
-        />
+        <Stack.Screen name="Main" component={MainTabs} options={{ headerShown: false }} />
+        <Stack.Screen name="ChatScreen" component={ChatScreen} options={{ headerShown: false }} />
       </Stack.Navigator>
     </NavigationContainer>
   );
