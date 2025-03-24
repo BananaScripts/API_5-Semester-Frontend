@@ -93,7 +93,7 @@ export const styles = StyleSheet.create({
     borderColor: "#9182FF",
     borderRadius: 8,
     borderWidth: 1,
-    padding: 10,
+    padding: 7,
     justifyContent: "center",
     fontFamily: 'JetBrainsMono',
   },
