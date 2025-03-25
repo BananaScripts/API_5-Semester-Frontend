@@ -1,11 +1,10 @@
-export const users = [
+export const users: User[] = [
     {
       cpf: '12345678900',
       senha: 'senha123',
       nome: 'João Silva',
       dataEntrada: '2023-01-15',
       cargo: 'Gerente',
-      permissao: ['admin', 'financeiro'],
       imagemPerfil: require('../../../assets/joao.png'), 
     },
     {
@@ -14,8 +13,17 @@ export const users = [
       nome: 'Maria Oliveira',
       dataEntrada: '2022-08-20',
       cargo: 'Analista de Suporte',
-      permissao: ['suporte', 'financeiro'],
       imagemPerfil: require('../../../assets/maria.png'),
     },
   ];
+  
+  export type User = {
+    cpf: string;
+    senha: string;
+    nome: string;
+    dataEntrada: any;
+    cargo: string;
+    imagemPerfil: any;
+    response?: (message: string) => string;
+  };
   

@@ -44,17 +44,17 @@ export default function App() {
     <ChatHistoryProvider>
       <NavigationContainer>
         <Stack.Navigator>
-        <Stack.Screen
-          name="Login"
-          component={Login}
-          options={{ headerShown: false }}
-        />
-        <Stack.Screen
-          name="HomeTabs"
-          component={MainTabs}
-          options={{ headerShown: false }}
-        />
-        <Stack.Screen 
+          <Stack.Screen
+            name="Login"
+            component={Login}
+            options={{ headerShown: false }}
+          />
+          <Stack.Screen
+            name="HomeTabs"
+            component={MainTabs}
+            options={{ headerShown: false }}
+          />
+          <Stack.Screen 
             name="ChatScreen" 
             component={ChatScreen as React.FC} 
             options={{ headerShown: false }} 
@@ -64,7 +64,7 @@ export default function App() {
             component={Perfil as React.FC} 
             options={{ headerShown: false }} 
           />
-      </Stack.Navigator>
+        </Stack.Navigator>
       </NavigationContainer>
     </ChatHistoryProvider>
   );

@@ -1,9 +1,16 @@
+export type Bot = {
+  id: string;
+  image: any;
+};
+
+export type User = {
+  cpf: string;
+  imagemPerfil: any;
+}
+
 export type RootStackParamList = {
-    Home: undefined;
-    ChatScreen: { bot: Bot };
-  };
-  
-  export type Bot = {
-    id: string;
-    image: any;
-  };
+  HomeTabs: { user: User };
+  Login: undefined;
+  ChatScreen: { bot: Bot }; 
+  Perfil: { user: User }; 
+};
