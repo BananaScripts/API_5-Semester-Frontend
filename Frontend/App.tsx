@@ -43,7 +43,7 @@ export default function App() {
   return (
     <ChatHistoryProvider>
       <NavigationContainer>
-      <Stack.Navigator>
+        <Stack.Navigator>
         <Stack.Screen
           name="Login"
           component={Login}
@@ -57,6 +57,11 @@ export default function App() {
         <Stack.Screen 
             name="ChatScreen" 
             component={ChatScreen as React.FC} 
+            options={{ headerShown: false }} 
+          />
+          <Stack.Screen 
+            name="Perfil" 
+            component={Perfil as React.FC} 
             options={{ headerShown: false }} 
           />
       </Stack.Navigator>
