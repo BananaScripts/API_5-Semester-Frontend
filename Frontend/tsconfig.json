@@ -20,7 +20,7 @@
   "include": [
     "src",
     "declarations.d.ts",
-    "svg.d.ts" // Add this line to include the SVG declaration file
+    "svg.d.ts"
   ],
   "exclude": [
     "node_modules"

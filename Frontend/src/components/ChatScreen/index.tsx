@@ -3,17 +3,28 @@ import { View, Text, Image, TextInput, TouchableOpacity, ScrollView } from 'reac
 import { Ionicons } from '@expo/vector-icons';
 import { styles } from './style';
 import { RouteProp } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack'; // Importando o tipo de navegação
 import { useNavigation } from '@react-navigation/native';
 import { Bot } from '../../data/bots/bots';
 import { useChatHistory } from '../../data/context/ChatHistoryContext';
 
-type ChatScreenRouteProp = RouteProp<{ ChatScreen: { bot: Bot } }, 'ChatScreen'>;
+// Definindo a tipagem para o parâmetro de rota e navegação
+type RootStackParamList = {
+  ChatScreen: { bot: Bot };
+};
 
-const ChatScreen = ({ route }: { route: ChatScreenRouteProp }) => {
+type ChatScreenRouteProp = RouteProp<RootStackParamList, 'ChatScreen'>;
+type ChatScreenNavigationProp = StackNavigationProp<RootStackParamList, 'ChatScreen'>;
+
+interface ChatScreenProps {
+  route: ChatScreenRouteProp;
+}
+
+const ChatScreen: React.FC<ChatScreenProps> = ({ route }) => {
   const { bot } = route.params;
-  const navigation = useNavigation();
+  const navigation = useNavigation<ChatScreenNavigationProp>(); // Tipando o useNavigation
   const { addChatToHistory } = useChatHistory();
-  const [messages, setMessages] = useState<{ sender: string, text: string }[]>([]);
+  const [messages, setMessages] = useState<{ sender: string; text: string }[]>([]);
   const [inputText, setInputText] = useState('');
 
   useEffect(() => {
