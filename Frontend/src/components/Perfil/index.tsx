@@ -1,7 +1,7 @@
 import { View, Text, Image, } from "react-native";
 import { styles } from "./style";
 import React, { useState } from "react";
-import { users, User } from '../../data/users/users';
+import { users, User } from '../../data/users/users'; // Adjusted path to match the correct location
 import { RootStackParamList } from '../../data/types/types'; 
 import { useNavigation, NavigationProp } from '@react-navigation/native';
 

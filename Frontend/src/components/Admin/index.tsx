@@ -171,28 +171,12 @@ const Admin = () => {
             value={userId?.toString() || ''}
             onChangeText={(text) => setUserId(Number(text))}
           />
-
-          <TouchableOpacity
-            style={styles.button}
-            onPress={() => handleAction("view")}
-          >
-            <Text style={styles.botaoTexto}>Visualizar Usuário</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.button}
-            onPress={() => handleAction("update")}
-          >
-            <Text style={styles.botaoTexto}>Atualizar Usuário</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.button}
-            onPress={() => handleAction("delete")} 
-          >
-            <Text style={styles.botaoTexto}>Deletar Usuário</Text>
-          </TouchableOpacity>
         </View>
+
+        <View style={styles.containerVisualizar}>
+          <Text style={styles.dadosText}>Visualizar Usuários</Text>
+        </View>
+
       </View>
     </ScrollView>
   );
