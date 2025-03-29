@@ -10,7 +10,7 @@ export const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingTop: "10%",
+    paddingTop: "5%",
     paddingBottom: "5%",
   },
   backButton: {

@@ -10,6 +10,7 @@ import Home from './src/components/Home';
 import Perfil from './src/components/Perfil';
 import Agentes from './src/components/Agentes';
 import Chat from './src/components/Chat';
+import Admin from './src/components/Admin';
 import Login from './src/components/Login';
 import ChatScreen from './src/components/ChatScreen'; 
 import { ChatHistoryProvider } from './src/data/context/ChatHistoryContext';
@@ -18,6 +19,8 @@ import HomeIcon from './assets/icons/home.svg';
 import PerfilIcon from './assets/icons/profile.svg';
 import AgentesIcon from './assets/icons/bots.svg';
 import ChatIcon from './assets/icons/chat.svg';
+import AdminIcon from './assets/icons/admin.svg';
+
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -64,6 +67,11 @@ export default function App() {
             component={Perfil as React.FC} 
             options={{ headerShown: false }} 
           />
+          <Stack.Screen 
+            name="Admin" 
+            component={Admin as React.FC} 
+            options={{ headerShown: false }} 
+          />
         </Stack.Navigator>
       </NavigationContainer>
     </ChatHistoryProvider>
@@ -80,6 +88,7 @@ function MainTabs() {
           'Chat': '#FC82FF',
           'Agentes': '#9182FF',
           'Home': '#92FFFF',
+          'Admin': '#9182FF',
         }[route.name] || 'white';
 
         return {
@@ -89,6 +98,7 @@ function MainTabs() {
               'Agentes': ChatIcon,
               'Chat': AgentesIcon,
               'Home': HomeIcon,
+              'Admin': AdminIcon,
             }[route.name];
 
             return (
@@ -108,6 +118,7 @@ function MainTabs() {
       <Tab.Screen name="Agentes" component={Agentes} />
       <Tab.Screen name="Chat" component={Chat} />
       <Tab.Screen name="Home" component={Home} />
+      <Tab.Screen name="Admin" component={Admin} />
     </Tab.Navigator>
   );
 }

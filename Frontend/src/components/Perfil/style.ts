@@ -12,7 +12,7 @@ export const styles = StyleSheet.create({
   titulo: {
     color: "#fff",
     fontSize: 30,
-    paddingTop: "15%",
+    paddingTop: "5%",
     paddingBottom: "5%",
     fontFamily: 'JetBrainsMono',
     textAlign: 'center', 
