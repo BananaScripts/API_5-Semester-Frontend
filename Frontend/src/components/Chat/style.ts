@@ -10,7 +10,7 @@ export const styles = StyleSheet.create({
     color: "#fff",
     fontSize: 30,
     paddingBottom: "5%",
-    paddingTop: "10%",
+    paddingTop: "5%",
     fontFamily: 'JetBrainsMono',
   },
   searchAndTagsWrapper: {
