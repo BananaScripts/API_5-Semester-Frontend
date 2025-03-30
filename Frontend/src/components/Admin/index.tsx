@@ -4,6 +4,7 @@ import { styles } from "./style";
 import React, { useState, useEffect } from "react";
 import { UserCreate } from "../../interfaces/userCreate"; 
 import UserService from "../../services/userService";
+import LogoutButton from '../Login/logout';
 
 const Admin = () => {
   const [userName, setUserName] = useState<string>('');
@@ -197,6 +198,15 @@ const Admin = () => {
             renderItem={renderEdit}
             keyExtractor={(item) => item.id.toString()}
           />
+          <TouchableOpacity
+            style={styles.button}
+            onPress={() => handleAction("delete")} 
+          >
+            <Text style={styles.botaoTexto}>Deletar Usuário</Text>
+          </TouchableOpacity>
+
+          <LogoutButton />
+
         </View>
       </View>
     </ScrollView>
