@@ -1,7 +1,7 @@
 export const users: User[] = [
     {
-      cpf: '12345678900',
-      senha: 'senha123',
+      cpf: '123',
+      senha: '123',
       nome: 'João Silva',
       dataEntrada: '2023-01-15',
       cargo: 'Gerente',

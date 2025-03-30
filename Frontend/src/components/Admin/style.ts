@@ -10,6 +10,7 @@ export const styles = StyleSheet.create({
   },
   scrollContainer: {
     flexGrow: 1,
+    height: 2000,
   },
   titulo: {
     color: "#92FFFF",  
@@ -91,5 +92,40 @@ export const styles = StyleSheet.create({
   },
   containerVisualizar: {
     backgroundColor: "#1E1E1E",
-  }
+    width: "100%",
+    padding: 10,
+    borderRadius: 15,
+    marginTop: 20,
+    borderWidth: 1,
+    borderColor: "#FFF",
+  },
+  tableHeader: {
+    flexDirection: 'row',
+    padding: 10,
+    backgroundColor: '#333',
+    borderTopLeftRadius: 12,
+    borderTopRightRadius: 12,
+  },
+  tableHeaderText: {
+    flex: 1,
+    color: '#FFF',
+    textAlign: 'center',
+    fontWeight: 'bold',
+    fontSize: 13,
+  },
+  tableRow: {
+    width: '100%',
+    flexDirection: 'row',
+    paddingVertical: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#ccc',
+    borderColor: '#FFF',
+    borderWidth: 1,
+  },
+  tableText: {
+    flex: 1,
+    color: '#FFF',
+    textAlign: 'center',
+    fontSize: 13,
+  },
 });

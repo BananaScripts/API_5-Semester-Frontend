@@ -1,34 +1,40 @@
-import { View, Text, TextInput, TouchableOpacity, ScrollView } from "react-native";  
+import { View, Text, TextInput, TouchableOpacity, ScrollView, FlatList } from "react-native";  
 import { Picker } from "@react-native-picker/picker";
 import { styles } from "./style";
 import React, { useState, useEffect } from "react";
 import { UserCreate } from "../../interfaces/userCreate"; 
-import { UserResponse } from "../../interfaces/userResponse";
-import { UserUpdate } from "../../interfaces/userUpdate";
-import GetAllusers from "../../services/userService";
 import UserService from "../../services/userService";
-import updateUser from "../../services/userService";
-import deleteUser from "../../services/userService";
-import getUserById from "../../services/userService";
 
 const Admin = () => {
   const [userName, setUserName] = useState<string>('');
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [role, setRole] = useState<number>(0); 
-  const [userId, setUserId] = useState<number | null>(null); 
+  const [users, setUsers] = useState<any[]>([]);
+  const [filteredUsers, setFilteredUsers] = useState<any[]>([]); 
+  const [searchTerm, setSearchTerm] = useState<string>('');
 
   useEffect(() => {
     const testConnection = async () => {
       try {
         const response = await UserService.getAllUsers(1, 10); 
         console.log("Connection successful:", response);
+        setUsers(response.items);
+        setFilteredUsers(response.items); 
       } catch (error) {
         console.error("Connection error:", error);
       }
     };
     testConnection();
   }, []);
+
+  useEffect(() => {
+    const filtered = users.filter((user) => 
+      user.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
+      user.email.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+    setFilteredUsers(filtered);
+  }, [searchTerm, users]);
 
   const handleRegister = async () => {
     const userData: UserCreate = {
@@ -49,68 +55,14 @@ const Admin = () => {
     }
   };
 
-  const handleDelete = async (Id: number) => {
-    try {
-      await UserService.deleteUser(Id);
-      console.log("User deleted:", Id);
-    } catch (error) {
-      console.error("Error deleting user:", error);
-    }
-  };
-
-  const handleGetUser = async (Id: number) => {
-    if (!Id) {
-      console.error("ID de usuário inválido.");
-      return;
-    }
-
-    try {
-      const response = await UserService.getUserById(Id);
-      console.log("User fetched:", response);
-    } catch (error) {
-      console.error("Error fetching user:", error);
-    }
-  };
-
-  const handleUpdate = async (Id: number) => {
-    if (!userName || !email || !password) {
-      console.error("Todos os campos devem ser preenchidos!");
-      return;
-    }
-
-    const userData: UserUpdate = {
-      Name: userName,
-      Password: password,
-      Email: email,
-      Role: role,
-    };
-
-    try {
-      const response = await UserService.updateUser(Id, userData);
-      console.log("User updated:", response);
-    } catch (error) {
-      console.error("Error updating user:", error);
-    }
-  };
-
-  const handleAction = (action: string) => {
-    if (!userId) {
-      console.error("Por favor, insira um ID de usuário válido.");
-      return;
-    }
-
-    switch (action) {
-      case "view":
-        handleGetUser(userId);
-        break;
-      case "update":
-        handleUpdate(userId);
-        break;
-      case "delete":
-        handleDelete(userId);
-        break;
-    }
-  };
+  const renderItem = ({ item }: { item: any }) => (
+    <View style={styles.tableRow}>
+      <Text style={styles.tableText}>{item.id}</Text>
+      <Text style={styles.tableText}>{item.name}</Text>
+      <Text style={styles.tableText}>{item.email}</Text>
+      <Text style={styles.tableText}>{item.role === 0 ? 'Usuário' : item.role === 1 ? 'Curador' : 'Administrador'}</Text>
+    </View>
+  );
 
   return (
     <ScrollView contentContainerStyle={styles.scrollContainer}>
@@ -162,21 +114,32 @@ const Admin = () => {
           <TouchableOpacity style={styles.button} onPress={handleRegister}>
             <Text style={styles.botaoTexto}>Cadastrar</Text>
           </TouchableOpacity>
-
-          <TextInput
-            style={styles.input}
-            placeholder="ID do Usuário (para editar ou deletar)"
-            placeholderTextColor="#888"
-            keyboardType="numeric"
-            value={userId?.toString() || ''}
-            onChangeText={(text) => setUserId(Number(text))}
-          />
         </View>
 
         <View style={styles.containerVisualizar}>
           <Text style={styles.dadosText}>Visualizar Usuários</Text>
-        </View>
 
+          <TextInput
+            style={styles.input}
+            placeholder="Pesquisar por nome ou email"
+            placeholderTextColor="#888"
+            value={searchTerm}
+            onChangeText={setSearchTerm}
+          />
+
+          <View style={styles.tableHeader}>
+            <Text style={styles.tableHeaderText}>ID</Text>
+            <Text style={styles.tableHeaderText}>Nome</Text>
+            <Text style={styles.tableHeaderText}>Email</Text>
+            <Text style={styles.tableHeaderText}>Tipo</Text>
+          </View>
+
+          <FlatList
+            data={filteredUsers}
+            renderItem={renderItem}
+            keyExtractor={(item) => item.id.toString()}
+          />
+        </View>
       </View>
     </ScrollView>
   );
