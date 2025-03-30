@@ -1,35 +1,48 @@
-import { View, Text, TextInput, TouchableOpacity, ScrollView } from "react-native";  
+import { View, Text, TextInput, TouchableOpacity, ScrollView, FlatList, Alert } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 import { styles } from "./style";
 import React, { useState, useEffect } from "react";
-import { UserCreate } from "../../interfaces/userCreate"; 
-import { UserResponse } from "../../interfaces/userResponse";
-import { UserUpdate } from "../../interfaces/userUpdate";
-import GetAllusers from "../../services/userService";
+import { UserCreate } from "../../interfaces/userCreate";
 import UserService from "../../services/userService";
-import updateUser from "../../services/userService";
-import deleteUser from "../../services/userService";
-import getUserById from "../../services/userService";
-import LogoutButton from '../Login/logout';
+import getUserRole from "../../services/decodedService";
+import useAuth from "../../Hooks/useAuth";
+
 
 const Admin = () => {
+  const { user: currentUser } = useAuth();
   const [userName, setUserName] = useState<string>('');
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [role, setRole] = useState<number>(0); 
-  const [userId, setUserId] = useState<number | null>(null); 
+  const [users, setUsers] = useState<any[]>([]);
+  const [filteredUsers, setFilteredUsers] = useState<any[]>([]); 
+  const [searchTerm, setSearchTerm] = useState<string>('');
 
   useEffect(() => {
     const testConnection = async () => {
       try {
-        const response = await UserService.getAllUsers(1, 10); 
-        console.log("Connection successful:", response);
+        const response = await UserService.getAllUsers(1, 10);
+        console.log("Connection successful:");
+        setUsers(response.items);
+        setFilteredUsers(response.items);
       } catch (error) {
         console.error("Connection error:", error);
       }
     };
-    testConnection();
-  }, []);
+    if (currentUser?.user_role === 2) {
+      testConnection();
+    }
+
+    const filtered = users.filter((user) =>
+      user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      user.email.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+    setFilteredUsers(filtered);
+
+
+  }, [searchTerm, users, currentUser]);
+
+
 
   const handleRegister = async () => {
     const userData: UserCreate = {
@@ -50,68 +63,57 @@ const Admin = () => {
     }
   };
 
-  const handleDelete = async (Id: number) => {
+  const handleDelete = async (userId: number) => {
     try {
-      await UserService.deleteUser(Id);
-      console.log("User deleted:", Id);
+      if (currentUser?.user_role !== 2) {
+        Alert.alert("Acesso Negado", "Somente administradores podem excluir usuários");
+        return;
+      }
+      if (currentUser?.user_id === userId) {
+        Alert.alert("Erro", "Você não pode excluir a si mesmo");
+        return;
+      }
+
+      await UserService.deleteUser(userId);
+
+      const updatedUsers = users.filter((user) => user.id !== userId);
+      setUsers(updatedUsers);
+      setFilteredUsers(updatedUsers);
     } catch (error) {
-      console.error("Error deleting user:", error);
+      if (error instanceof Error) {
+        console.error("Error deleting user:", error.message);
+        alert("Não foi possível excluir o usuário. Verifique se você tem permissões suficientes.");
+      } else {
+        console.error("Unknown error:", error);
+        alert("Ocorreu um erro desconhecido.");
+      }
     }
   };
 
-  const handleGetUser = async (Id: number) => {
-    if (!Id) {
-      console.error("ID de usuário inválido.");
-      return;
-    }
+  const renderItem = ({ item }: { item: any }) => (
+    <View style={styles.tableRow}>
+      <Text style={styles.tableText}>{item.id}</Text>
+      <Text style={styles.tableText}>{item.name}</Text>
+      <Text style={styles.tableText}>{item.email}</Text>
+      <Text style={styles.tableText}>{item.role === 0 ? 'Usuário' : item.role === 1 ? 'Curador' : 'Administrador'}</Text>
+    </View>
+  );
 
-    try {
-      const response = await UserService.getUserById(Id);
-      console.log("User fetched:", response);
-    } catch (error) {
-      console.error("Error fetching user:", error);
-    }
-  };
-
-  const handleUpdate = async (Id: number) => {
-    if (!userName || !email || !password) {
-      console.error("Todos os campos devem ser preenchidos!");
-      return;
-    }
-
-    const userData: UserUpdate = {
-      Name: userName,
-      Password: password,
-      Email: email,
-      Role: role,
-    };
-
-    try {
-      const response = await UserService.updateUser(Id, userData);
-      console.log("User updated:", response);
-    } catch (error) {
-      console.error("Error updating user:", error);
-    }
-  };
-
-  const handleAction = (action: string) => {
-    if (!userId) {
-      console.error("Por favor, insira um ID de usuário válido.");
-      return;
-    }
-
-    switch (action) {
-      case "view":
-        handleGetUser(userId);
-        break;
-      case "update":
-        handleUpdate(userId);
-        break;
-      case "delete":
-        handleDelete(userId);
-        break;
-    }
-  };
+  const renderEdit = ({ item }: { item: any }) => (
+    <View style={styles.tableRow}>
+      <Text style={styles.tableText}>{item.id}</Text>
+      <Text style={styles.tableText}>{item.name}</Text>
+      <TouchableOpacity style={styles.buttonEdit}>
+        <Text style={styles.buttonText}>Editar</Text>
+      </TouchableOpacity>
+      <TouchableOpacity
+        style={styles.buttonDelete}
+        onPress={() => handleDelete(item.id)}
+      >
+        <Text style={styles.buttonText}>Excluir</Text>
+      </TouchableOpacity>
+    </View>
+  );
 
   return (
     <ScrollView contentContainerStyle={styles.scrollContainer}>
@@ -150,7 +152,7 @@ const Admin = () => {
           <View style={styles.inputTipo}>
             <Picker
               selectedValue={role}
-              onValueChange={(itemValue) => setRole(itemValue as 0 | 1 | 2)} 
+              onValueChange={(itemValue) => setRole(itemValue as 0 | 1 | 2)}
               dropdownIconColor="#92FFFF"
               style={{ color: "#FFF" }}
             >
@@ -163,38 +165,57 @@ const Admin = () => {
           <TouchableOpacity style={styles.button} onPress={handleRegister}>
             <Text style={styles.botaoTexto}>Cadastrar</Text>
           </TouchableOpacity>
+        </View>
+
+        <View style={styles.containerVisualizar}>
+          <Text style={styles.dadosText}>Visualizar Usuários</Text>
 
           <TextInput
             style={styles.input}
-            placeholder="ID do Usuário (para editar ou deletar)"
+            placeholder="Pesquisar por nome ou email"
             placeholderTextColor="#888"
-            keyboardType="numeric"
-            value={userId?.toString() || ''}
-            onChangeText={(text) => setUserId(Number(text))}
+            value={searchTerm}
+            onChangeText={setSearchTerm}
           />
 
-          <TouchableOpacity
-            style={styles.button}
-            onPress={() => handleAction("view")}
-          >
-            <Text style={styles.botaoTexto}>Visualizar Usuário</Text>
-          </TouchableOpacity>
+          <View style={styles.tableHeader}>
+            <Text style={styles.tableHeaderText}>ID</Text>
+            <Text style={styles.tableHeaderText}>Nome</Text>
+            <Text style={styles.tableHeaderText}>Email</Text>
+            <Text style={styles.tableHeaderText}>Tipo</Text>
+          </View>
 
-          <TouchableOpacity
-            style={styles.button}
-            onPress={() => handleAction("update")}
-          >
-            <Text style={styles.botaoTexto}>Atualizar Usuário</Text>
-          </TouchableOpacity>
+          <FlatList
+            data={filteredUsers}
+            renderItem={renderItem}
+            keyExtractor={(item) => item.id.toString()}
+          />
+        </View>
 
-          <TouchableOpacity
-            style={styles.button}
-            onPress={() => handleAction("delete")} 
-          >
-            <Text style={styles.botaoTexto}>Deletar Usuário</Text>
-          </TouchableOpacity>
+        <View style={styles.containerEditar}>
+          <Text style={styles.dadosText}> Editar Usuários</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Pesquisar por nome ou email"
+            placeholderTextColor="#888"
+            value={searchTerm}
+            onChangeText={setSearchTerm}
+          />
 
-          <LogoutButton />
+          <View style={styles.tableHeader}>
+            <Text style={styles.tableHeaderText}>ID</Text>
+            <Text style={styles.tableHeaderText}>Nome</Text>
+            <Text style={styles.tableHeaderText}>Editar</Text>
+            <Text style={styles.tableHeaderText}>Excluir</Text>
+          </View>
+
+          <FlatList
+            data={filteredUsers}
+            renderItem={renderEdit}
+            keyExtractor={(item) => item.id.toString()}
+          />
+
+
 
         </View>
       </View>

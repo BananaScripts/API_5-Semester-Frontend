@@ -11,15 +11,17 @@ export const styles = StyleSheet.create({
   },
   titulo: {
     color: "#fff",
-    fontSize: 30,
+    fontSize: 25,
     paddingTop: "5%",
     paddingBottom: "5%",
     fontFamily: 'JetBrainsMono',
     textAlign: 'center', 
+    justifyContent: 'space-between',
   },
   containerTitulo: {
     alignItems: "flex-start",
     width: "90%",
+    flexDirection: "row",
   },
   userText: {
     color: "#92FFFF",

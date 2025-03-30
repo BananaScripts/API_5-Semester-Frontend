@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, TouchableOpacity, Text, TextInput, Image, Alert, ActivityIndicator } from 'react-native';
 import { styles } from './style';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Login = ({ navigation }: any) => {
   const [email, setEmail] = useState('');
@@ -19,7 +20,7 @@ const Login = ({ navigation }: any) => {
       const response = await fetch('http://10.0.2.2:7254/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }), // Enviando "password" no JSON
+        body: JSON.stringify({ email, password }),
       });
 
       if (!response.ok) {
@@ -35,6 +36,11 @@ const Login = ({ navigation }: any) => {
       }
 
       const data = await response.json();
+      await AsyncStorage.multiSet([
+        ['token', data.token.result],
+        ['user', JSON.stringify(data.user)]
+      ]);
+      console.log('Login bem-sucedido:', data);
       navigation.replace('HomeTabs', { user: data });
 
     } catch (error: any) {
