@@ -40,4 +40,22 @@ export const styles = StyleSheet.create({
         fontSize: 16,
         fontFamily: 'JetBrainsMono',
       },
+      logoutButton: {
+        backgroundColor: '#d6332d',
+        padding: 10,
+        alignItems: 'center',
+        height: 35,
+        width: '20%',
+        display: 'flex',
+        borderRadius: 15,
+        borderColor: 'white',
+        position: 'absolute',
+        marginLeft: 300,
+        marginTop: 20,
+      },
+      botaoTexto: {
+        color: "white", 
+        fontFamily: "JetBrainsMono",
+        fontSize: 13, 
+      },
 });

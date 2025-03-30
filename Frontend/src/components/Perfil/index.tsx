@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { users, User } from '../../data/users/users';
 import { RootStackParamList } from '../../data/types/types'; 
 import { useNavigation, NavigationProp } from '@react-navigation/native';
+import LogoutButton from '../Login/logout';
 
 const Perfil = () => {
     const [searchText, setSearchText] = useState("");
@@ -24,6 +25,7 @@ const Perfil = () => {
     <View style={styles.container}>
       <View style={styles.containerTitulo}>
         <Text style={styles.titulo}>Perfil do Usuário</Text>
+        <LogoutButton />
       </View>
       
       <View style={styles.fotoUsuario}>

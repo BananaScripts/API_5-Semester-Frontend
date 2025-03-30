@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, TouchableOpacity, Text, TextInput, Image, Alert, ActivityIndicator } from 'react-native';
 import { styles } from './style';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Login = ({ navigation }: any) => {
   const [email, setEmail] = useState('');
@@ -35,6 +36,8 @@ const Login = ({ navigation }: any) => {
       }
 
       const data = await response.json();
+      await AsyncStorage.setItem('token', JSON.stringify(data.token.result));
+      console.log('Login bem-sucedido:', data);
       navigation.replace('HomeTabs', { user: data });
 
     } catch (error: any) {

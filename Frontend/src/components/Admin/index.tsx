@@ -4,7 +4,8 @@ import { styles } from "./style";
 import React, { useState, useEffect } from "react";
 import { UserCreate } from "../../interfaces/userCreate"; 
 import UserService from "../../services/userService";
-import LogoutButton from '../Login/logout';
+import getUserRole from "../../services/decodedService";
+
 
 const Admin = () => {
   const [userName, setUserName] = useState<string>('');
@@ -14,12 +15,13 @@ const Admin = () => {
   const [users, setUsers] = useState<any[]>([]);
   const [filteredUsers, setFilteredUsers] = useState<any[]>([]); 
   const [searchTerm, setSearchTerm] = useState<string>('');
+  const [userRole, setUserRole] = useState<number | null>(null);
 
   useEffect(() => {
     const testConnection = async () => {
       try {
         const response = await UserService.getAllUsers(1, 10); 
-        console.log("Connection successful:", response);
+        console.log("Connection successful:");
         setUsers(response.items);
         setFilteredUsers(response.items); 
       } catch (error) {
@@ -27,15 +29,22 @@ const Admin = () => {
       }
     };
     testConnection();
-  }, []);
 
-  useEffect(() => {
     const filtered = users.filter((user) => 
       user.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
       user.email.toLowerCase().includes(searchTerm.toLowerCase())
     );
     setFilteredUsers(filtered);
+
+    const fetchUserRole = async () => {
+      const userRole = await getUserRole();
+      setUserRole(userRole);
+      console.log("User role:", userRole);
+    };
+    fetchUserRole();
   }, [searchTerm, users]);
+
+  
 
   const handleRegister = async () => {
     const userData: UserCreate = {
@@ -198,14 +207,8 @@ const Admin = () => {
             renderItem={renderEdit}
             keyExtractor={(item) => item.id.toString()}
           />
-          <TouchableOpacity
-            style={styles.button}
-            onPress={() => handleAction("delete")} 
-          >
-            <Text style={styles.botaoTexto}>Deletar Usuário</Text>
-          </TouchableOpacity>
 
-          <LogoutButton />
+          
 
         </View>
       </View>

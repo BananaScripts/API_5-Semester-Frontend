@@ -10,7 +10,7 @@ export const styles = StyleSheet.create({
   },
   scrollContainer: {
     flexGrow: 1,
-    height: 2150,
+    height: 2500,
   },
   titulo: {
     color: "#92FFFF",  
