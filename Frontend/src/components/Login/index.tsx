@@ -20,7 +20,7 @@ const Login = ({ navigation }: any) => {
       const response = await fetch('http://10.0.2.2:7254/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }), // Enviando "password" no JSON
+        body: JSON.stringify({ email, password }),
       });
 
       if (!response.ok) {
@@ -36,7 +36,10 @@ const Login = ({ navigation }: any) => {
       }
 
       const data = await response.json();
-      await AsyncStorage.setItem('token', JSON.stringify(data.token.result));
+      await AsyncStorage.multiSet([
+        ['token', data.token.result],
+        ['user', JSON.stringify(data.user)]
+      ]);
       console.log('Login bem-sucedido:', data);
       navigation.replace('HomeTabs', { user: data });
 

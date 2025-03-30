@@ -2,15 +2,20 @@ import React from 'react';
 import { TouchableOpacity, Text, Alert } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
-import { styles } from '../Login/style'; 
+import { styles } from '../Login/style';
+import useAuth from '../../Hooks/useAuth';
 
 const LogoutButton = () => {
-  const navigation = useNavigation();
+  const navigation = useNavigation<{ replace: (screen: string) => void }>();
+  const { logout } = useAuth();
 
   const handleLogout = async () => {
     try {
-      await AsyncStorage.removeItem('authToken'); // Remove o token salvo
-      navigation.replace('Login'); // Volta para a tela de login
+      await AsyncStorage.multiRemove(['token', 'user']);
+      
+      logout();
+      
+      navigation.replace('Login');
     } catch (error) {
       Alert.alert('Erro', 'Não foi possível sair.');
       console.error('Erro ao fazer logout:', error);
