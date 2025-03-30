@@ -5,7 +5,6 @@
 - Entrar na pasta Frontend e rodar esses comandos:
 
 npm install
-
 npx expo start
 
 - Após iniciar, aperta "a" para selecionar android.
