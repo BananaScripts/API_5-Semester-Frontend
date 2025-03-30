@@ -10,6 +10,7 @@ import UserService from "../../services/userService";
 import updateUser from "../../services/userService";
 import deleteUser from "../../services/userService";
 import getUserById from "../../services/userService";
+import LogoutButton from '../Login/logout';
 
 const Admin = () => {
   const [userName, setUserName] = useState<string>('');
@@ -192,6 +193,9 @@ const Admin = () => {
           >
             <Text style={styles.botaoTexto}>Deletar Usuário</Text>
           </TouchableOpacity>
+
+          <LogoutButton />
+
         </View>
       </View>
     </ScrollView>
