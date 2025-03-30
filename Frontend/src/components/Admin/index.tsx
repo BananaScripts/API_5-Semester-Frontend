@@ -55,6 +55,24 @@ const Admin = () => {
     }
   };
 
+  const handleDelete = async (userId: number) => {
+  try {
+    await UserService.deleteUser(userId);
+
+    const updatedUsers = users.filter((user) => user.id !== userId);
+    setUsers(updatedUsers);
+    setFilteredUsers(updatedUsers); 
+  } catch (error) {
+    if (error instanceof Error) { 
+      console.error("Error deleting user:", error.message);
+      alert("Não foi possível excluir o usuário. Verifique se você tem permissões suficientes.");
+    } else {
+      console.error("Unknown error:", error);
+      alert("Ocorreu um erro desconhecido.");
+    }
+  }
+};
+
   const renderItem = ({ item }: { item: any }) => (
     <View style={styles.tableRow}>
       <Text style={styles.tableText}>{item.id}</Text>
@@ -62,6 +80,22 @@ const Admin = () => {
       <Text style={styles.tableText}>{item.email}</Text>
       <Text style={styles.tableText}>{item.role === 0 ? 'Usuário' : item.role === 1 ? 'Curador' : 'Administrador'}</Text>
     </View>
+  );
+
+  const renderEdit = ({ item }: { item: any }) => (
+    <View style={styles.tableRow}>
+    <Text style={styles.tableText}>{item.id}</Text>
+    <Text style={styles.tableText}>{item.name}</Text>
+    <TouchableOpacity style={styles.buttonEdit}>
+      <Text style={styles.buttonText}>Editar</Text>
+    </TouchableOpacity>
+    <TouchableOpacity 
+      style={styles.buttonDelete} 
+      onPress={() => handleDelete(item.id)}
+    >
+      <Text style={styles.buttonText}>Excluir</Text>
+    </TouchableOpacity>
+  </View>
   );
 
   return (
@@ -137,6 +171,30 @@ const Admin = () => {
           <FlatList
             data={filteredUsers}
             renderItem={renderItem}
+            keyExtractor={(item) => item.id.toString()}
+          />
+        </View>
+
+        <View style={styles.containerEditar}>
+          <Text style={styles.dadosText}> Editar Usuários</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Pesquisar por nome ou email"
+            placeholderTextColor="#888"
+            value={searchTerm}
+            onChangeText={setSearchTerm}
+          />
+
+          <View style={styles.tableHeader}>
+            <Text style={styles.tableHeaderText}>ID</Text>
+            <Text style={styles.tableHeaderText}>Nome</Text>
+            <Text style={styles.tableHeaderText}>Editar</Text>
+            <Text style={styles.tableHeaderText}>Excluir</Text>
+          </View>
+
+          <FlatList
+            data={filteredUsers}
+            renderItem={renderEdit}
             keyExtractor={(item) => item.id.toString()}
           />
         </View>

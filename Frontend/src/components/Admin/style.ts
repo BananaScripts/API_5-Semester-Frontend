@@ -10,7 +10,7 @@ export const styles = StyleSheet.create({
   },
   scrollContainer: {
     flexGrow: 1,
-    height: 2000,
+    height: 2150,
   },
   titulo: {
     color: "#92FFFF",  
@@ -127,5 +127,37 @@ export const styles = StyleSheet.create({
     color: '#FFF',
     textAlign: 'center',
     fontSize: 13,
+  },
+  containerEditar: {
+    backgroundColor: "#1E1E1E",
+    width: "100%",
+    padding: 10,
+    borderRadius: 15,
+    marginTop: 20,
+    borderWidth: 1,
+    borderColor: "#FFF",
+  },
+  buttonEdit: {
+    backgroundColor: '#4756fc',
+    alignItems: 'center',
+    width: '15%',  
+    borderColor: 'white',
+    marginHorizontal: 17,
+    paddingVertical: 10,
+    borderRadius: 8,
+  },
+  buttonDelete: {
+    backgroundColor: '#bf3939',
+    paddingVertical: 12,
+    marginHorizontal: 20,
+    alignItems: 'center',
+    width: '15%',  
+    borderRadius: 8,
+  },
+  buttonText: {
+    color: '#FFF',
+    fontFamily: 'JetBrainsMono',
+    fontSize: 10,
+    fontWeight: 'bold',
   },
 });
