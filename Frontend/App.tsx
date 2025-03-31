@@ -88,7 +88,7 @@ function MainTabs() {
           'Chat': '#FC82FF',
           'Agentes': '#9182FF',
           'Home': '#92FFFF',
-          'Admin': '#9182FF',
+          'Admin': 'white',
         }[route.name] || 'white';
 
         return {

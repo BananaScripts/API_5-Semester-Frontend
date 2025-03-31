@@ -10,7 +10,7 @@ export const styles = StyleSheet.create({
   },
   scrollContainer: {
     flexGrow: 1,
-    height: 2500,
+    height: 1750,
   },
   titulo: {
     color: "#92FFFF",  
@@ -93,6 +93,7 @@ export const styles = StyleSheet.create({
   containerVisualizar: {
     backgroundColor: "#1E1E1E",
     width: "100%",
+    maxHeight: 500,
     padding: 10,
     borderRadius: 15,
     marginTop: 20,

@@ -22,7 +22,6 @@ const Admin = () => {
     const testConnection = async () => {
       try {
         const response = await UserService.getAllUsers(1, 10);
-        console.log("Connection successful:");
         setUsers(response.items);
         setFilteredUsers(response.items);
       } catch (error) {
@@ -168,56 +167,81 @@ const Admin = () => {
         </View>
 
         <View style={styles.containerVisualizar}>
-          <Text style={styles.dadosText}>Visualizar Usuários</Text>
+  <Text style={styles.dadosText}>Visualizar Usuários</Text>
 
-          <TextInput
-            style={styles.input}
-            placeholder="Pesquisar por nome ou email"
-            placeholderTextColor="#888"
-            value={searchTerm}
-            onChangeText={setSearchTerm}
-          />
+  <TextInput
+    style={styles.input}
+    placeholder="Pesquisar por nome ou email"
+    placeholderTextColor="#888"
+    value={searchTerm}
+    onChangeText={setSearchTerm}
+  />
 
-          <View style={styles.tableHeader}>
-            <Text style={styles.tableHeaderText}>ID</Text>
-            <Text style={styles.tableHeaderText}>Nome</Text>
-            <Text style={styles.tableHeaderText}>Email</Text>
-            <Text style={styles.tableHeaderText}>Tipo</Text>
-          </View>
+  <View style={styles.tableHeader}>
+    <Text style={styles.tableHeaderText}>ID</Text>
+    <Text style={styles.tableHeaderText}>Nome</Text>
+    <Text style={styles.tableHeaderText}>Email</Text>
+    <Text style={styles.tableHeaderText}>Tipo</Text>
+  </View>
 
-          <FlatList
-            data={filteredUsers}
-            renderItem={renderItem}
-            keyExtractor={(item) => item.id.toString()}
-          />
-        </View>
+  <ScrollView
+    style={{ maxHeight: 300 }}
+    contentContainerStyle={{ flexGrow: 1 }}
+    nestedScrollEnabled={true}
+  >
+    {filteredUsers.map((item) => (
+      <View key={item.id} style={styles.tableRow}>
+        <Text style={styles.tableText}>{item.id}</Text>
+        <Text style={styles.tableText}>{item.name}</Text>
+        <Text style={styles.tableText}>{item.email}</Text>
+        <Text style={styles.tableText}>
+          {item.role === 0 ? "Usuário" : item.role === 1 ? "Curador" : "Administrador"}
+        </Text>
+      </View>
+    ))}
+  </ScrollView>
+</View>
 
-        <View style={styles.containerEditar}>
-          <Text style={styles.dadosText}> Editar Usuários</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Pesquisar por nome ou email"
-            placeholderTextColor="#888"
-            value={searchTerm}
-            onChangeText={setSearchTerm}
-          />
+<View style={styles.containerEditar}>
+  <Text style={styles.dadosText}>Editar Usuários</Text>
 
-          <View style={styles.tableHeader}>
-            <Text style={styles.tableHeaderText}>ID</Text>
-            <Text style={styles.tableHeaderText}>Nome</Text>
-            <Text style={styles.tableHeaderText}>Editar</Text>
-            <Text style={styles.tableHeaderText}>Excluir</Text>
-          </View>
+  <TextInput
+    style={styles.input}
+    placeholder="Pesquisar por nome ou email"
+    placeholderTextColor="#888"
+    value={searchTerm}
+    onChangeText={setSearchTerm}
+  />
 
-          <FlatList
-            data={filteredUsers}
-            renderItem={renderEdit}
-            keyExtractor={(item) => item.id.toString()}
-          />
+  <View style={styles.tableHeader}>
+    <Text style={styles.tableHeaderText}>ID</Text>
+    <Text style={styles.tableHeaderText}>Nome</Text>
+    <Text style={styles.tableHeaderText}>Editar</Text>
+    <Text style={styles.tableHeaderText}>Excluir</Text>
+  </View>
 
-
-
-        </View>
+  <ScrollView
+    style={{ maxHeight: 300 }} 
+    contentContainerStyle={{ flexGrow: 1 }}
+    nestedScrollEnabled={true}
+  >
+    {filteredUsers.map((item) => (
+      <View key={item.id} style={styles.tableRow}>
+        <Text style={styles.tableText}>{item.id}</Text>
+        <Text style={styles.tableText}>{item.name}</Text>
+        <TouchableOpacity style={styles.buttonEdit}>
+          <Text style={styles.buttonText}>Editar</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.buttonDelete}
+          onPress={() => handleDelete(item.id)}
+        >
+          <Text style={styles.buttonText}>Excluir</Text>
+        </TouchableOpacity>
+      </View>
+    ))}
+  </ScrollView>
+</View>
       </View>
     </ScrollView>
   );
