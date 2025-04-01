@@ -60,6 +60,7 @@ const Admin = () => {
     } catch (error) {
       console.error("Error creating user:", error);
     }
+    alert("Usuários criado com sucesso!");
   };
 
   const handleDelete = async (userId: number) => {
@@ -87,6 +88,7 @@ const Admin = () => {
         alert("Ocorreu um erro desconhecido.");
       }
     }
+    alert("Dados excluídos com sucesso!");
   };
 
   const renderItem = ({ item }: { item: any }) => (
