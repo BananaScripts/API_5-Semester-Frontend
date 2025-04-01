@@ -198,6 +198,14 @@ const Admin = () => {
         <View style={styles.containerEditar}>
           <Text style={styles.dadosText}>Editar Usuários</Text>
 
+          <TextInput
+            style={styles.input}
+            placeholder="Pesquisar por nome ou email"
+            placeholderTextColor="#888"
+            value={searchTerm}
+            onChangeText={setSearchTerm}
+          />
+
           <ScrollView style={{ maxHeight: 300 }} contentContainerStyle={{ flexGrow: 1 }} nestedScrollEnabled={true}>
             {filteredUsers.map((user) => (
               <View key={user.id} style={styles.tableRow}>
