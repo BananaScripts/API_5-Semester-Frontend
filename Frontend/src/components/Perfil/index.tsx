@@ -69,8 +69,6 @@ const Perfil = () => {
       alert("Erro ao atualizar os dados.");
     }
   };
-    
-
   
 
   return (
