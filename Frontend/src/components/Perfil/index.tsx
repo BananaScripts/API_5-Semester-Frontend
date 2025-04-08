@@ -85,7 +85,9 @@ const Perfil = () => {
 
       <View style={styles.containerDados}>
         <Text style={styles.userText}>Nome: {currentUser.user_name}</Text> 
-        <Text style={styles.dadosText}>Tipo do usuário: {currentUser.user_role === 2 ? 'Admin' : 'User'}</Text> 
+        <Text style={styles.dadosText}>
+          Tipo do usuário: {currentUser.user_role === 0 ? 'Usuário' : currentUser.user_role === 1 ? 'Curador' : 'Admin'}
+        </Text> 
         <Text style={styles.dadosText}>Email: {currentUser.user_email}</Text> 
       </View>
 
