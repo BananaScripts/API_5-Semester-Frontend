@@ -5,8 +5,10 @@ import { styles } from "./style";
 import { bots, Bot } from "../../data/bots/bots"; 
 import { RootStackParamList } from '../../data/types/types'; 
 import { useChatHistory } from '../../data/context/ChatHistoryContext';
+import useAuth from "../../Hooks/useAuth";
 
 const Home = () => {
+  const { user: currentUser } = useAuth();
   const [searchText, setSearchText] = useState("");
   const [filteredBots, setFilteredBots] = useState<Bot[]>(bots);
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
@@ -27,11 +29,18 @@ const Home = () => {
   const handleBotPress = (bot: Bot) => {
     navigation.navigate('ChatScreen', { bot });
   };
+  if (!currentUser) {
+      return (
+        <View style={styles.container}>
+          <Text style={styles.titulo}>Nenhum usuário encontrado</Text>
+        </View>
+      );
+    }
 
   return (
     <View style={styles.container}>
       <Text style={styles.titulo}>
-        Bem-vindo/a de volta, <Text style={styles.userText}>usuário!</Text>
+        Bem-vindo/a de volta, <Text style={styles.userText}>{currentUser.user_name}!</Text>
       </Text>
       
       <View style={styles.pesquisar}>

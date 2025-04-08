@@ -15,7 +15,7 @@
     "jsx": "react-jsx",
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
-    "allowSyntheticDefaultImports": true // Add this line
+    "allowSyntheticDefaultImports": true 
   },
   "include": [
     "src",

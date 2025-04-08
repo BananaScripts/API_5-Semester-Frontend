@@ -3,12 +3,11 @@ import { View, Text, Image, TextInput, TouchableOpacity, ScrollView } from 'reac
 import { Ionicons } from '@expo/vector-icons';
 import { styles } from './style';
 import { RouteProp } from '@react-navigation/native';
-import { StackNavigationProp } from '@react-navigation/stack'; // Importando o tipo de navegação
+import { StackNavigationProp } from '@react-navigation/stack'; 
 import { useNavigation } from '@react-navigation/native';
 import { Bot } from '../../data/bots/bots';
 import { useChatHistory } from '../../data/context/ChatHistoryContext';
 
-// Definindo a tipagem para o parâmetro de rota e navegação
 type RootStackParamList = {
   ChatScreen: { bot: Bot };
 };
@@ -22,7 +21,7 @@ interface ChatScreenProps {
 
 const ChatScreen: React.FC<ChatScreenProps> = ({ route }) => {
   const { bot } = route.params;
-  const navigation = useNavigation<ChatScreenNavigationProp>(); // Tipando o useNavigation
+  const navigation = useNavigation<ChatScreenNavigationProp>(); 
   const { addChatToHistory } = useChatHistory();
   const [messages, setMessages] = useState<{ sender: string; text: string }[]>([]);
   const [inputText, setInputText] = useState('');

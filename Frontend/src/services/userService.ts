@@ -4,6 +4,7 @@ import { UserResponse } from "../interfaces/userResponse";
 import { PaginatedResponse } from "../interfaces/paginatedResponse";
 import jwtDecode from "jwt-decode";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { UserUpdate } from "../interfaces/userUpdate";
 
 
 const UserService = {
@@ -23,14 +24,16 @@ const UserService = {
       throw new Error("Error fetching user: " + error);
     }
   },
-    async updateUser(Id: number, userData: UserCreate): Promise<UserResponse> {
-        try {
+  async updateUser(Id: number, userData: Partial<UserUpdate>): Promise<UserResponse> {
+    try {
         const response = await api.put<UserResponse>(`/user/User/${Id}`, userData);
         return response.data;
-        } catch (error) {
+    } catch (error: any) {
+        console.error("Error updating user:", error.response?.data || error.message);
         throw new Error("Error updating user: " + error);
-        }
-    },
+    }
+},
+
     async deleteUser(Id: number): Promise<void> {
         try {
         await api.delete(`/user/User/${Id}`);
