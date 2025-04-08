@@ -11,7 +11,7 @@ import Perfil from './src/components/Perfil';
 import Agentes from './src/components/Agentes';
 import Chat from './src/components/Chat';
 import Admin from './src/components/Admin';
-import Curador from './src/components/Curador'
+import Curador from './src/components/Curador';
 import Login from './src/components/Login';
 import ChatScreen from './src/components/ChatScreen'; 
 import { ChatHistoryProvider } from './src/data/context/ChatHistoryContext';
@@ -22,7 +22,7 @@ import AgentesIcon from './assets/icons/bots.svg';
 import ChatIcon from './assets/icons/chat.svg';
 import AdminIcon from './assets/icons/admin.svg';
 import CuradorIcon from './assets/icons/bots.svg';
-
+import useAuth from './src/Hooks/useAuth'; // Certifique-se de que o useAuth está importado corretamente.
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -86,6 +86,29 @@ export default function App() {
 }
 
 function MainTabs() {
+  const { user: currentUser } = useAuth(); // Obtendo a role do usuário logado
+
+  // Função para retornar as abas conforme a role do usuário
+  const getTabScreens = () => {
+    const tabs = [
+      { name: "Perfil", component: Perfil },
+      { name: "Chat", component: Chat },
+      { name: "Agentes", component: Agentes },
+      { name: "Home", component: Home },
+    ];
+
+    // Adiciona abas específicas dependendo da role
+    if (currentUser?.user_role === 1) {
+      tabs.push({ name: "Curador", component: Curador });
+    }
+    if (currentUser?.user_role === 2) {
+      tabs.push({ name: "Curador", component: Curador });
+      tabs.push({ name: "Admin", component: Admin });
+    }
+
+    return tabs;
+  };
+
   return (
     <Tab.Navigator
       initialRouteName="Home" 
@@ -123,12 +146,13 @@ function MainTabs() {
         };
       }}
     >
-      <Tab.Screen name="Perfil" component={Perfil} />
-      <Tab.Screen name="Agentes" component={Agentes} />
-      <Tab.Screen name="Chat" component={Chat} />
-      <Tab.Screen name="Home" component={Home} />
-      <Tab.Screen name="Curador" component={Curador} />
-      <Tab.Screen name="Admin" component={Admin} />
+      {getTabScreens().map((tab) => (
+        <Tab.Screen
+          key={tab.name}
+          name={tab.name}
+          component={tab.component}
+        />
+      ))}
     </Tab.Navigator>
   );
 }

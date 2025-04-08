@@ -17,7 +17,6 @@ const Admin = () => {
   const [modalVisible, setModalVisible] = useState<boolean>(false);
   const [editingUser, setEditingUser] = useState<any>(null);
 
-  // Função para buscar usuários
   const fetchUsers = async () => {
     try {
       const response = await UserService.getAllUsers(1, 10);
@@ -30,7 +29,7 @@ const Admin = () => {
 
   useEffect(() => {
     if (currentUser?.user_role === 2) {
-      fetchUsers();  // Aqui a função fetchUsers é chamada.
+      fetchUsers(); 
     }
   }, [currentUser]);
 
@@ -84,8 +83,7 @@ const Admin = () => {
       Alert.alert("Sucesso", "Usuário atualizado com sucesso!");
       setModalVisible(false);
       
-      // Recarregue os usuários após a atualização
-      fetchUsers();  // Aqui chamamos a função `fetchUsers` após editar.
+      fetchUsers(); 
     } catch (error) {
       console.error("Erro ao editar usuário", error);
       Alert.alert("Erro", "Não foi possível atualizar o usuário.");
