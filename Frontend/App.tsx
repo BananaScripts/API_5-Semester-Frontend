@@ -11,6 +11,7 @@ import Perfil from './src/components/Perfil';
 import Agentes from './src/components/Agentes';
 import Chat from './src/components/Chat';
 import Admin from './src/components/Admin';
+import Curador from './src/components/Curador'
 import Login from './src/components/Login';
 import ChatScreen from './src/components/ChatScreen'; 
 import { ChatHistoryProvider } from './src/data/context/ChatHistoryContext';
@@ -20,6 +21,7 @@ import PerfilIcon from './assets/icons/profile.svg';
 import AgentesIcon from './assets/icons/bots.svg';
 import ChatIcon from './assets/icons/chat.svg';
 import AdminIcon from './assets/icons/admin.svg';
+import CuradorIcon from './assets/icons/bots.svg';
 
 
 const Stack = createStackNavigator();
@@ -68,6 +70,11 @@ export default function App() {
             options={{ headerShown: false }} 
           />
           <Stack.Screen 
+            name="Curador" 
+            component={Curador as React.FC} 
+            options={{ headerShown: false }} 
+          />
+          <Stack.Screen 
             name="Admin" 
             component={Admin as React.FC} 
             options={{ headerShown: false }} 
@@ -89,6 +96,7 @@ function MainTabs() {
           'Agentes': '#9182FF',
           'Home': '#92FFFF',
           'Admin': 'white',
+          'Curador': 'red'
         }[route.name] || 'white';
 
         return {
@@ -99,6 +107,7 @@ function MainTabs() {
               'Chat': AgentesIcon,
               'Home': HomeIcon,
               'Admin': AdminIcon,
+              'Curador': CuradorIcon,
             }[route.name];
 
             return (
@@ -118,6 +127,7 @@ function MainTabs() {
       <Tab.Screen name="Agentes" component={Agentes} />
       <Tab.Screen name="Chat" component={Chat} />
       <Tab.Screen name="Home" component={Home} />
+      <Tab.Screen name="Curador" component={Curador} />
       <Tab.Screen name="Admin" component={Admin} />
     </Tab.Navigator>
   );
