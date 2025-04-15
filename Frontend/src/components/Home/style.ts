@@ -16,8 +16,6 @@ export const styles = StyleSheet.create({
   },
   subtitulo: {
     color: "#fff",
-    fontSize: 15,
-    padding: 10,
     fontFamily: 'JetBrainsMono',
   },
   subtitulo2: {
