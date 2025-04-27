@@ -35,7 +35,9 @@ const Curador = () => {
     }
   };
   useEffect(() => {
-    if (currentUser?.user_role >= 1) fetchAgents();
+    if (currentUser?.user_role && currentUser.user_role >= 1) {
+      fetchAgents();
+    }
   }, [currentUser]);
 
   const handleRegister = async () => {
