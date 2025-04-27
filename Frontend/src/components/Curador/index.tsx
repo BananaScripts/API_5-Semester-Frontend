@@ -14,28 +14,26 @@ const Curador = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [editingAgent, setEditingAgent] = useState<any>(null);
 
-const fetchAgents = async () => {
-  try {
-    const response = await AgentService.getAllAgents(1, 20);
     // Fazer um map para ajustar os nomes dos campos
-    const mappedAgents = response.items.map((agent: any) => ({
-      agent_id: agent.agentId,
-      agent_name: agent.name,
-      agent_description: agent.description,
-      agent_config: agent.config,
-      status: agent.status,
-      created_by_user_id: agent.createdByUserId,
-      created_at: agent.createdAt,
-      updated_at: agent.updatedAt,
-    }));
-    setAgents(mappedAgents);
-  } catch (error) {
-    console.error(error);
-    Alert.alert("Erro", "Não foi possível carregar agentes.");
-  }
-};
-
-
+  const fetchAgents = async () => {
+    try {
+      const response = await AgentService.getAllAgents(1, 20);
+      const mappedAgents = response.items.map((agent: any) => ({
+        agent_id: agent.agentId,
+        agent_name: agent.name,
+        agent_description: agent.description,
+        agent_config: agent.config,
+        status: agent.status,
+        created_by_user_id: agent.createdByUserId,
+        created_at: agent.createdAt,
+        updated_at: agent.updatedAt,
+      }));
+      setAgents(mappedAgents);
+    } catch (error) {
+      console.error(error);
+      Alert.alert("Erro", "Não foi possível carregar agentes.");
+    }
+  };
   useEffect(() => {
     if (currentUser?.user_role >= 1) fetchAgents();
   }, [currentUser]);
@@ -48,7 +46,9 @@ const fetchAgents = async () => {
         Config: JSON.parse(config),
       };
       await AgentService.createAgent(agentData);
-      setName(""); setDescription(""); setConfig("{}");
+      setName("");
+      setDescription("");
+      setConfig("{}");
       Alert.alert("Sucesso", "Agente criado com sucesso!");
       fetchAgents();
     } catch (error) {
@@ -57,41 +57,37 @@ const fetchAgents = async () => {
     }
   };
 
-const openEditModal = (agent: any) => {
-  setEditingAgent(agent);
-  setName(agent.agent_name || agent.name || "");  // <- aqui
-  setDescription(agent.agent_description || agent.description || "");  // <- aqui
-  setConfig(JSON.stringify(agent.agent_config || agent.config || {}));  // <- aqui
-  setModalVisible(true);
-};
+  const openEditModal = (agent: any) => {
+    setEditingAgent(agent);
+    setName(agent.agent_name || agent.name || "");
+    setDescription(agent.agent_description || agent.description || "");
+    setConfig(JSON.stringify(agent.agent_config || agent.config || {}));
+    setModalVisible(true);
+  };
 
-
-const handleEdit = async () => {
-  if (!editingAgent) return;
-
-  try {
-    const updatedAgent = {
-      id: editingAgent.agent_id, // ID correto para a API
-      name,
-      description,
-      config: JSON.parse(config),
-    };
-
-    await AgentService.updateAgent(updatedAgent);
-
-    Alert.alert("Sucesso", "Agente atualizado com sucesso.");
-    fetchAgents(); // Recarrega a lista
-    setModalVisible(false);
-  } catch (error) {
-    console.error("Error updating agent:", error);
-    Alert.alert("Erro", "Não foi possível atualizar o agente.");
-  }
-};
-
-
+  const handleEdit = async () => {
+    if (!editingAgent) return;
+  
+    try {
+      const updatedAgent = {
+        agentId: editingAgent.agent_id, 
+        Name: name,
+        Description: description,
+        Config: JSON.parse(config),
+      };
+  
+      await AgentService.updateAgent(editingAgent.agent_id, updatedAgent); 
+      Alert.alert("Sucesso", "Agente atualizado com sucesso.");
+      fetchAgents();
+      setModalVisible(false);
+    } catch (error) {
+      console.error("Erro ao atualizar o agente:", error);
+      Alert.alert("Erro", "Não foi possível atualizar o agente.");
+    }
+  };
 
   const handleDelete = async (id: number) => {
-    if (currentUser?.user_role < 2) {
+    if (!currentUser?.user_role || currentUser.user_role < 2) {
       Alert.alert("Acesso Negado", "Somente administradores podem excluir agentes.");
       return;
     }
@@ -105,16 +101,13 @@ const handleEdit = async () => {
     }
   };
 
-    const filtered = agents.filter(a =>
-        (a.agent_name || "").toLowerCase().includes((searchQuery || "").toLowerCase())
-    );
-
+  const filtered = agents.filter(a =>
+    (a.agent_name || "").toLowerCase().includes((searchQuery || "").toLowerCase())
+  );
 
   return (
     <ScrollView contentContainerStyle={styles.scrollContainer}>
       <View style={styles.container}>
-
-        {/* Cadastro de Agente */}
         <View style={styles.containerUsuario}>
           <Text style={styles.dadosText}>Cadastrar Agente</Text>
           <TextInput
@@ -144,7 +137,7 @@ const handleEdit = async () => {
           </TouchableOpacity>
         </View>
 
-        {/* Listagem e Ações */}
+
         <View style={styles.containerVisualizar}>
           <Text style={styles.dadosText}>Visualizar Agentes</Text>
           <TextInput
@@ -154,25 +147,22 @@ const handleEdit = async () => {
             onChangeText={setSearchQuery}
             placeholderTextColor="#888"
           />
-
-{filtered.map((agent, index) => (
-  <View key={agent.agent_id ?? index} style={styles.agentCard}>
-    <Text style={styles.agentName}>{agent.agent_name}</Text>
-    <Text style={styles.agentDescription}>{agent.agent_description}</Text>
-    <View style={styles.agentActions}>
-      <TouchableOpacity style={styles.editButton} onPress={() => openEditModal(agent)}>
-        <Text style={styles.buttonText}>Editar</Text>
-      </TouchableOpacity>
-      <TouchableOpacity style={styles.deleteButton} onPress={() => handleDelete(agent.agent_id)}>
-        <Text style={styles.buttonText}>Deletar</Text>
-      </TouchableOpacity>
-    </View>
-  </View>
-))}
-
+          {filtered.map((agent, index) => (
+            <View key={agent.agent_id ?? index} style={styles.agentCard}>
+              <Text style={styles.agentName}>{agent.agent_name}</Text>
+              <Text style={styles.agentDescription}>{agent.agent_description}</Text>
+              <View style={styles.agentActions}>
+                <TouchableOpacity style={styles.editButton} onPress={() => openEditModal(agent)}>
+                  <Text style={styles.buttonText}>Editar</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.deleteButton} onPress={() => handleDelete(agent.agent_id)}>
+                  <Text style={styles.buttonText}>Deletar</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          ))}
         </View>
 
-        {/* Modal de Edição */}
         <Modal visible={modalVisible} animationType="slide" transparent={true}>
           <View style={styles.modalContainer}>
             <View style={styles.modalContent}>
