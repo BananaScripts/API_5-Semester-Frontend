@@ -1,42 +1,40 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { View, Text, TextInput, Image, ScrollView, TouchableOpacity } from "react-native";
 import { useNavigation } from '@react-navigation/native';
 import { styles } from "./style"; 
-import { bots } from "../../data/bots/bots";
-
-const categories = ['faq', 'chatbot', 'tutorial'];
+import { getBots, Bot } from "../../services/chatService";
 
 type ChatScreenNavigationProp = {
-  navigate: (screen: string, params: { bot: { id: string; descricao: string; category: string; image: any; } }) => void;
+  navigate: (screen: string, params: { bot: Bot }) => void;
 };
 
 const Chat = () => {
   const navigation = useNavigation<ChatScreenNavigationProp>();
   const [searchText, setSearchText] = useState("");
-  const [filteredBots, setFilteredBots] = useState(bots);
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [filteredBots, setFilteredBots] = useState<Bot[]>([]);
+
+  useEffect(() => {
+    const fetchBots = async () => {
+      const bots = await getBots();
+      setFilteredBots(bots);
+    };
+
+    fetchBots();
+  }, []);
 
   const handleSearch = (text: string) => {
     setSearchText(text);
-    filterBots(text, selectedCategory);
+    filterBots(text);
   };
 
-  const handleCategoryPress = (category: string) => {
-    const newSelectedCategory = selectedCategory === category ? null : category;
-    setSelectedCategory(newSelectedCategory);
-    filterBots(searchText, newSelectedCategory);
-  };
-
-  const filterBots = (text: string, category: string | null) => {
-    const filtered = bots.filter(bot => 
-      (bot.id.toLowerCase().includes(text.toLowerCase()) || 
-      bot.descricao.toLowerCase().includes(text.toLowerCase())) &&
-      (!category || bot.category === category)
+  const filterBots = (text: string) => {
+    const filtered = filteredBots.filter(bot => 
+      bot.name.toLowerCase().includes(text.toLowerCase())
     );
     setFilteredBots(filtered);
   };
 
-  const handleBotPress = (bot: { id: string; descricao: string; category: string; image: any }) => {
+  const handleBotPress = (bot: Bot) => {
     navigation.navigate('ChatScreen', { bot });
   };
 
@@ -53,18 +51,6 @@ const Chat = () => {
             value={searchText}
             onChangeText={handleSearch}
           />
-
-          <View style={styles.tagContainer}>
-            {categories.map(category => (
-              <TouchableOpacity
-                key={category}
-                style={[styles.tag, selectedCategory === category && styles.selectedTag]}
-                onPress={() => handleCategoryPress(category)}
-              >
-                <Text style={styles.tagText}>{category}</Text>
-              </TouchableOpacity>
-            ))}
-          </View>
         </View>
       </View>
 
@@ -75,7 +61,7 @@ const Chat = () => {
               <TouchableOpacity key={bot.id} style={styles.botCard} onPress={() => handleBotPress(bot)}>
                 <Image style={styles.botImage} source={bot.image} />
                 <View style={styles.botInfo}>
-                  <Text style={styles.botTitle}>{bot.id} - {bot.category}</Text>
+                  <Text style={styles.botTitle}>{bot.name}</Text>
                   <Text style={styles.botDescription}>{bot.descricao}</Text>
                 </View>
               </TouchableOpacity>

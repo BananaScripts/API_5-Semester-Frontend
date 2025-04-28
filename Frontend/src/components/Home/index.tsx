@@ -1,8 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { View, Text, TextInput, Image, ScrollView, TouchableOpacity } from "react-native";
 import { useNavigation, NavigationProp } from '@react-navigation/native';
 import { styles } from "./style"; 
-import { bots, Bot } from "../../data/bots/bots"; 
+import { getBots, Bot } from "../../services/chatService"; 
 import { RootStackParamList } from '../../data/types/types'; 
 import { useChatHistory } from '../../data/context/ChatHistoryContext';
 import useAuth from "../../Hooks/useAuth";
@@ -10,16 +10,26 @@ import useAuth from "../../Hooks/useAuth";
 const Home = () => {
   const { user: currentUser } = useAuth();
   const [searchText, setSearchText] = useState("");
-  const [filteredBots, setFilteredBots] = useState<Bot[]>(bots);
+  const [filteredBots, setFilteredBots] = useState<Bot[]>([]);
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const { chatHistory } = useChatHistory(); 
+
+  useEffect(() => {
+    const fetchBots = async () => {
+      const bots = await getBots();
+      setFilteredBots(bots);
+    };
+
+    fetchBots();
+  }, []);
+
   const handleSearch = (text: string) => {
     setSearchText(text);
     filterBots(text);
   };
 
   const filterBots = (text: string) => {
-    const filtered = bots.filter(bot => 
+    const filtered = filteredBots.filter(bot => 
       bot.id.toLowerCase().includes(text.toLowerCase()) || 
       bot.descricao.toLowerCase().includes(text.toLowerCase())
     );
@@ -29,13 +39,14 @@ const Home = () => {
   const handleBotPress = (bot: Bot) => {
     navigation.navigate('ChatScreen', { bot });
   };
+
   if (!currentUser) {
-      return (
-        <View style={styles.container}>
-          <Text style={styles.titulo}>Nenhum usuário encontrado</Text>
-        </View>
-      );
-    }
+    return (
+      <View style={styles.container}>
+        <Text style={styles.titulo}>Nenhum usuário encontrado</Text>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
@@ -61,7 +72,7 @@ const Home = () => {
             {filteredBots.map((bot) => (
               <TouchableOpacity key={bot.id} style={styles.agentesChats} onPress={() => handleBotPress(bot)}>
                 <Image style={styles.imagemBots} source={bot.image} />
-                <Text style={styles.subtitulo2}>{bot.id}</Text>
+                <Text style={styles.subtitulo2}>{bot.name}</Text>
               </TouchableOpacity>
             ))}
           </View>
@@ -77,7 +88,7 @@ const Home = () => {
               <TouchableOpacity key={bot.id} style={styles.agentesHistorico} onPress={() => handleBotPress(bot)}>
                 <Image style={styles.imagemBotsHistorico} source={bot.image} />
                 <View style={styles.botInfo}>
-                  <Text style={styles.subtitulo3}>{bot.id}</Text>
+                  <Text style={styles.subtitulo3}>{bot.name}</Text>
                   <Text style={styles.subtitulo3}>{bot.descricao}</Text>
                 </View>
               </TouchableOpacity>
