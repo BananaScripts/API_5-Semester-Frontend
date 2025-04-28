@@ -12,9 +12,11 @@ const Curador = () => {
   const [agents, setAgents] = useState<any[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [modalVisible, setModalVisible] = useState(false);
+  const [editName, setEditName] = useState("");         
+  const [editDescription, setEditDescription] = useState(""); 
+  const [editConfig, setEditConfig] = useState<string>("{}");
   const [editingAgent, setEditingAgent] = useState<any>(null);
 
-    // Fazer um map para ajustar os nomes dos campos
   const fetchAgents = async () => {
     try {
       const response = await AgentService.getAllAgents(1, 20);
@@ -34,6 +36,7 @@ const Curador = () => {
       Alert.alert("Erro", "Não foi possível carregar agentes.");
     }
   };
+
   useEffect(() => {
     if (currentUser?.user_role && currentUser.user_role >= 1) {
       fetchAgents();
@@ -61,29 +64,37 @@ const Curador = () => {
 
   const openEditModal = (agent: any) => {
     setEditingAgent(agent);
-    setName(agent.agent_name || agent.name || "");
-    setDescription(agent.agent_description || agent.description || "");
-    setConfig(JSON.stringify(agent.agent_config || agent.config || {}));
+    setEditName(agent.agent_name || agent.name || "");
+    setEditDescription(agent.agent_description || agent.description || "");
+    setEditConfig(JSON.stringify(agent.agent_config || agent.config || "{}"));
     setModalVisible(true);
   };
 
   const handleEdit = async () => {
-    if (!editingAgent) return;
+    if (!editingAgent) return; 
+  
+    const updatedData: Partial<any> = {};
+  
+    if (editName) updatedData.Name = editName; 
+    if (editDescription) updatedData.Description = editDescription;
+  
+    let parsedConfig;
+    try {
+      parsedConfig = JSON.parse(editConfig);
+      updatedData.Config = parsedConfig;  
+    } catch (error) {
+      Alert.alert("Erro", "A configuração deve ser um JSON válido.");
+      return; 
+    }
   
     try {
-      const updatedAgent = {
-        agentId: editingAgent.agent_id, 
-        Name: name,
-        Description: description,
-        Config: JSON.parse(config),
-      };
-  
-      await AgentService.updateAgent(editingAgent.agent_id, updatedAgent); 
-      Alert.alert("Sucesso", "Agente atualizado com sucesso.");
-      fetchAgents();
+      await AgentService.updateAgent(editingAgent.agent_id, updatedData);
+      Alert.alert("Sucesso", "Agente atualizado com sucesso!");
+
       setModalVisible(false);
+      fetchAgents();
     } catch (error) {
-      console.error("Erro ao atualizar o agente:", error);
+      console.error("Erro ao editar agente", error);
       Alert.alert("Erro", "Não foi possível atualizar o agente.");
     }
   };
@@ -110,6 +121,7 @@ const Curador = () => {
   return (
     <ScrollView contentContainerStyle={styles.scrollContainer}>
       <View style={styles.container}>
+        {/* Formulário de cadastro de agentes */}
         <View style={styles.containerUsuario}>
           <Text style={styles.dadosText}>Cadastrar Agente</Text>
           <TextInput
@@ -139,7 +151,7 @@ const Curador = () => {
           </TouchableOpacity>
         </View>
 
-
+        {/* Lista de agentes */}
         <View style={styles.containerVisualizar}>
           <Text style={styles.dadosText}>Visualizar Agentes</Text>
           <TextInput
@@ -171,22 +183,22 @@ const Curador = () => {
               <Text style={styles.modalTitle}>Editar Agente</Text>
               <TextInput
                 style={styles.input}
-                value={name}
-                onChangeText={setName}
+                value={editName}
+                onChangeText={setEditName}
                 placeholder="Nome"
                 placeholderTextColor="#888"
               />
               <TextInput
                 style={styles.input}
-                value={description}
-                onChangeText={setDescription}
+                value={editDescription}
+                onChangeText={setEditDescription}
                 placeholder="Descrição"
                 placeholderTextColor="#888"
               />
               <TextInput
                 style={styles.inputbd}
-                value={config}
-                onChangeText={setConfig}
+                value={editConfig}
+                onChangeText={setEditConfig}
                 placeholder="Config (JSON)"
                 placeholderTextColor="#888"
                 multiline
