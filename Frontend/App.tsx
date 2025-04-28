@@ -21,8 +21,8 @@ import PerfilIcon from './assets/icons/profile.svg';
 import AgentesIcon from './assets/icons/bots.svg';
 import ChatIcon from './assets/icons/chat.svg';
 import AdminIcon from './assets/icons/admin.svg';
-import CuradorIcon from './assets/icons/bots.svg';
-import useAuth from './src/Hooks/useAuth'; // Certifique-se de que o useAuth está importado corretamente.
+import CuradorIcon from './assets/icons/curador.svg';
+import useAuth from './src/Hooks/useAuth'; 
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -111,31 +111,35 @@ function MainTabs() {
 
   return (
     <Tab.Navigator
-      initialRouteName="Home" 
+      initialRouteName="Home"
       screenOptions={({ route }) => {
         const borderColor = {
-          'Perfil': '#92FFFF',
-          'Chat': '#FC82FF',
-          'Agentes': '#9182FF',
-          'Home': '#92FFFF',
-          'Admin': 'white',
-          'Curador': 'red'
+          Perfil: '#92FFFF',
+          Chat: '#FC82FF',
+          Agentes: '#9182FF',
+          Home: '#92FFFF',
+          Admin: '#FF5733', // Example color for Admin
+          Curador: '#FFC300', // Example color for Curador
         }[route.name] || 'white';
 
         return {
           tabBarIcon: ({ focused, size }) => {
             const IconComponent = {
-              'Perfil': PerfilIcon,
-              'Agentes': ChatIcon,
-              'Chat': AgentesIcon,
-              'Home': HomeIcon,
-              'Admin': AdminIcon,
-              'Curador': CuradorIcon,
+              Perfil: PerfilIcon,
+              Agentes: AgentesIcon,
+              Chat: ChatIcon,
+              Home: HomeIcon,
+              Admin: AdminIcon,
+              Curador: CuradorIcon,
             }[route.name];
 
             return (
               <View style={styles.iconContainer}>
-                <IconComponent width={size + 10} height={size + 10} style={{ color: focused ? borderColor : 'white' }} />
+                <IconComponent
+                  width={size + 10}
+                  height={size + 10}
+                  style={{ color: focused ? borderColor : 'white' }} // Ensure consistent color application
+                />
               </View>
             );
           },

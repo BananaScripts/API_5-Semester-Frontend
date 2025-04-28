@@ -5,8 +5,6 @@ import { PaginatedResponse } from "../interfaces/paginatedResponse";
 import jwtDecode from "jwt-decode";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { UserUpdate } from "../interfaces/userUpdate";
-import { AgentResponse } from "../interfaces/agentResponse";
-
 
 const UserService = {
   async getAllUsers(page: number = 1, pageSize: number = 10): Promise<PaginatedResponse<UserResponse>> {
