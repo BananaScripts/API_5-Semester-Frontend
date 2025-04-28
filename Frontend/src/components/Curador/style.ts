@@ -54,7 +54,7 @@ export const styles = StyleSheet.create({
     textAlignVertical: 'top',
   },
   button: {
-    backgroundColor: '#92FFFF',
+    backgroundColor: '#FFC300',
     paddingVertical: 12,
     alignItems: 'center',
     width: '50%',
@@ -86,7 +86,7 @@ export const styles = StyleSheet.create({
   },
   agentName: {
     fontSize: 18,
-    color: "#92FFFF",
+    color: "#FFC300",
     fontFamily: "JetBrainsMono",
     fontWeight: "bold",
   },
