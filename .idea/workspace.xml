@@ -5,9 +5,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="7d36338a-e036-45ed-95d7-7e6d0a45fea6" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/caches/deviceStreaming.xml" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Frontend/src/components/ChatScreen/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/Frontend/src/components/ChatScreen/index.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Frontend/src/services/userService.ts" beforeDir="false" afterPath="$PROJECT_DIR$/Frontend/src/services/userService.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

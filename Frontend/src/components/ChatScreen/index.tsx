@@ -13,11 +13,11 @@ import { Ionicons } from '@expo/vector-icons';
 import { RouteProp, useRoute, useNavigation } from '@react-navigation/native';
 import type { StackNavigationProp } from '@react-navigation/stack';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import api from '../../services/api'; // Importação correta do serviço API
+import api from '../../services/api';
 import { Bot } from '../../services/chatService';
 import { useChatHistory } from '../../data/context/ChatHistoryContext';
 import { styles } from './style';
-import useAuth from "../../Hooks/useAuth"; // Importação do hook de autenticação
+import useAuth from "../../Hooks/useAuth";
 
 type RootStackParamList = {
   ChatScreen: {
@@ -38,14 +38,15 @@ type Message = {
 export default function ChatScreen() {
   const { bot } = useRoute<ChatScreenRouteProp>().params;
   const navigation = useNavigation<ChatScreenNavigationProp>();
-  const { user } = useAuth(); // Obtenha os dados do usuário autenticado
-  const userId = user?.user_id; // Pegue o ID do usuário a partir do estado global
+  const { user } = useAuth();
+  const userId = user?.user_id;
   const { addChatToHistory } = useChatHistory();
 
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputText, setInputText] = useState('');
   const [loading, setLoading] = useState(true);
   const [chatId, setChatId] = useState<string | null>(null);
+  const [isConnected, setIsConnected] = useState(false); // Mover para dentro do componente
   const wsRef = useRef<WebSocket | null>(null);
   const scrollViewRef = useRef<ScrollView>(null);
 
@@ -54,110 +55,92 @@ export default function ChatScreen() {
       const response = await api.get(`/Chat/${id}`);
       setMessages(response.data.messages.map((msg: any) => ({
         sender: msg.sender === 'user' ? 'user' : 'bot',
-        text: msg.text
+        text: msg.text,
       })));
     } catch (error) {
-      console.warn('Histórico não carregado, iniciando sem histórico.');
+      console.warn('Histórico não carregado.');
     } finally {
       setLoading(false);
     }
   }, []);
 
-
-  // Modifique a conexão do WebSocket para incluir o token na query string
   const initializeChat = useCallback(async () => {
     try {
       const token = await AsyncStorage.getItem('token');
       if (!token) throw new Error('Token não encontrado');
 
-      // 1. Criar chat com userId
-      const createRes = await api.post('/Chat', `"${userId}"`, {
-        headers: { 'Content-Type': 'application/json' }
-      });
+      // Criar chat
+      const createRes = await api.post(
+        '/Chat',
+        `"${userId}"`,
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      setChatId(createRes.data.id);
 
-      // 2. Configurar WebSocket com token na URL
+      // Configurar WebSocket
       const wsUrl = `ws://10.0.2.2:7254/ws/chat/${userId}?agentId=${bot.id}&token=${encodeURIComponent(token)}`;
       const ws = new WebSocket(wsUrl);
 
-      // 3. Configurar eventos
       ws.onopen = () => {
-        console.log('WS conectado!');
-        ws.send(JSON.stringify({ type: 'auth', token }));
+        console.log('Conexão estabelecida!');
+        setIsConnected(true); // Atualizar estado de conexão
       };
-  
-      ws.onmessage = (event) => {0
+
+      ws.onmessage = (event) => {
         try {
           const response = JSON.parse(event.data);
           setMessages((prev) => [
             ...prev,
-            {
-              sender: 'bot',
-              text: response.text,
-            },
+            { sender: 'bot', text: response.text },
           ]);
         } catch (error) {
           console.error('Erro na mensagem:', error);
         }
       };
-  
+
       ws.onerror = (error) => {
         Alert.alert('Erro', 'Conexão falhou');
         console.error('WebSocket error:', error);
       };
-  
+
       wsRef.current = ws;
     } catch (error: any) {
-      console.error('Erro na inicialização:', error.response?.data || error.message);
-      Alert.alert('Erro', 'Falha ao iniciar chat: ' + (error.response?.data?.title || error.message));
+      console.error('Erro na inicialização:', error);
+      Alert.alert('Erro', 'Falha ao iniciar chat');
       if (navigation.canGoBack()) {
         navigation.goBack();
+      } else {
+        
       }
     }
-  }, [userId, bot.id, navigation, loadChatHistory]);
+  }, [userId, bot.id, navigation]);
 
   useEffect(() => {
-    const initialize = async () => {
-      try {
-        setLoading(true);
-        await initializeChat();
-      } catch (error) {
-        console.error('Erro ao inicializar:', error);
-        Alert.alert('Erro', 'Falha ao iniciar a conversa.');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    initialize();
-
-    return () => {
-      wsRef.current?.close();
-    };
+    initializeChat();
+    return () => wsRef.current?.close();
   }, [initializeChat]);
 
   const handleSend = async () => {
     if (!inputText.trim() || !chatId || !wsRef.current) return;
 
     try {
-      // Mensagem temporária local
-      setMessages(prev => [...prev, { sender: 'user', text: inputText }]);
+      setMessages((prev) => [...prev, { sender: 'user', text: inputText }]);
       setInputText('');
 
-      // Envio via WebSocket
-      wsRef.current.send(JSON.stringify({
-        message: inputText,
-        timestamp: new Date().toISOString()
-      }));
+      // Enviar apenas o texto via WS
+      wsRef.current.send(inputText);
 
-      // Persistência via API
       await api.post(`/Chat/${chatId}/messages?agentId=${bot.id}`, {
         Sender: 'user',
-        Text: inputText
+        Text: inputText,
       });
-
     } catch (error) {
       Alert.alert('Erro', 'Mensagem não enviada');
-      console.error('Send error:', error);
     }
   };
 
@@ -170,38 +153,6 @@ export default function ChatScreen() {
     );
   }
 
-  const handleDeleteChat = async () => {
-    if (!chatId) {
-      Alert.alert('Erro', 'Chat não encontrado.');
-      return;
-    }
-
-    try {
-      // Confirmação do usuário antes de deletar
-      Alert.alert(
-        'Confirmar',
-        'Tem certeza de que deseja excluir este chat?',
-        [
-          { text: 'Cancelar', style: 'cancel' },
-          {
-            text: 'Excluir',
-            style: 'destructive',
-            onPress: async () => {
-              // Chamada para deletar o chat via API
-              await api.delete(`/Chat/${chatId}`);
-              Alert.alert('Sucesso', 'Chat excluído com sucesso.');
-              navigation.goBack(); // Retorna à tela anterior
-            },
-          },
-        ],
-        { cancelable: true }
-      );
-    } catch (error) {
-      console.error('Erro ao excluir o chat:', error);
-      Alert.alert('Erro', 'Não foi possível excluir o chat.');
-    }
-  };
-
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -210,7 +161,7 @@ export default function ChatScreen() {
         </TouchableOpacity>
         <Image source={bot.image} style={styles.botImage} />
         <Text style={styles.botName}>{bot.name}</Text>
-        <TouchableOpacity onPress={handleDeleteChat} style={styles.deleteButton}>
+        <TouchableOpacity style={styles.deleteButton}>
           <Ionicons name="trash" size={24} color="red" />
         </TouchableOpacity>
       </View>
