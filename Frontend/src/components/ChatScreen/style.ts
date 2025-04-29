@@ -80,4 +80,30 @@ export const styles = StyleSheet.create({
   messageText: {
     color: '#fff',
   },
+    footer: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      padding: 10,
+      backgroundColor: '#f1f1f1',
+    },
+    footerButton: {
+      padding: 10,
+      backgroundColor: '#007bff',
+      borderRadius: 5,
+    },
+    footerButtonText: {
+      color: '#fff',
+      fontWeight: 'bold',
+    },
+    deleteButton: {
+      marginLeft: 'auto',
+      padding: 10,
+      backgroundColor: 'transparent',
+    },
+    loadingText: {
+      marginTop: 10,
+      fontSize: 16,
+      color: '#888',
+      textAlign: 'center',
+    },
 });

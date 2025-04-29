@@ -6,8 +6,21 @@ import jwtDecode from "jwt-decode";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { UserUpdate } from "../interfaces/userUpdate";
 
-
 const UserService = {
+  async getAllUsers(page: number = 1, pageSize: number = 10): Promise<PaginatedResponse<UserResponse>> {
+    try {
+      const response = await api.get<PaginatedResponse<UserResponse>>(`/user/User`, {
+        params: {
+          page,
+          pageSize,
+        },
+      });
+      return response.data;
+    } catch (error) {
+      throw new Error("Error fetching users: " + error);
+    }
+  },
+
   async createUser(userData: UserCreate): Promise<UserResponse> {
     try {
       const response = await api.post<UserResponse>("/user/User", userData);
@@ -39,15 +52,6 @@ const UserService = {
         await api.delete(`/user/User/${Id}`);
         } catch (error) {
         throw new Error("Error deleting user: " + error);
-        }
-    },
-    async getAllUsers(page: number = 1, pageSize: number = 10): Promise<PaginatedResponse<UserResponse>> {
-        try {
-        const response = await api.get("/user/User", {
-            params: {page, pageSize}})
-            return response.data;
-        } catch (error) {
-        throw new Error("Error fetching users: " + error);
         }
     },
 }
