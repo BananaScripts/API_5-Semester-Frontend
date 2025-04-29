@@ -2,7 +2,6 @@ import api from "./api";
 import { UserCreate } from "../interfaces/userCreate";
 import { UserResponse } from "../interfaces/userResponse";
 import { PaginatedResponse } from "../interfaces/paginatedResponse";
-import jwtDecode from "jwt-decode";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { UserUpdate } from "../interfaces/userUpdate";
 
