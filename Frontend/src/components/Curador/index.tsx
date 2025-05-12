@@ -74,7 +74,7 @@ const Curador = () => {
     Name: name,
     Description: description,
     Config: {
-      SystemPrompt: systemPrompt.trim() === "" ? editingAgent.agent_config.SystemPrompt : systemPrompt,
+      SystemPrompt: systemPrompt.trim() || editingAgent?.agent_config?.SystemPrompt || "Prompt padrão",
       AllowedFileTypes: ["pdf"],
     },
   };
