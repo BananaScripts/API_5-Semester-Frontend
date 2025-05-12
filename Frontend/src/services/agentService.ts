@@ -46,7 +46,7 @@ const AgentService = {
 
   async deleteAgent(id: number): Promise<void> {
     try {
-      await api.delete(`/agent/agMySqlConnector.MySqlConnectionent/${id}`);
+      await api.delete(`/agent/agent/${id}`);
     } catch (error) {
       throw new Error("Error deleting agent: " + error);
     }
