@@ -34,19 +34,19 @@ const AgentService = {
     }
   },
 
-  async updateAgent(id: number, agentData: Partial<AgentUpdate>): Promise<AgentResponse> {
-    try {
-      const response = await api.put<AgentResponse>(`/agent/agent/${id}`, agentData);
-      return response.data;
-    } catch (error: any) {
-      console.error("Error updating agent:", error.response?.data || error.message);
-      throw new Error("Error updating agent: " + error);
-    }
-  },
+  async updateAgent(id: number, agentData: AgentUpdate): Promise<AgentResponse> {
+  try {
+    const response = await api.put<AgentResponse>(`/agent/agent/${id}`, agentData);
+    return response.data;
+  } catch (error: any) {
+    console.error("Error updating agent:", error.response?.data || error.message);
+    throw new Error("Error updating agent: " + error);
+  }
+},
 
   async deleteAgent(id: number): Promise<void> {
     try {
-      await api.delete(`/agent/Agent/${id}`);
+      await api.delete(`/agent/agMySqlConnector.MySqlConnectionent/${id}`);
     } catch (error) {
       throw new Error("Error deleting agent: " + error);
     }
