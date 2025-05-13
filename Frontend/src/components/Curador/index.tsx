@@ -3,18 +3,18 @@ import { View, Text, TextInput, TouchableOpacity, ScrollView, Alert, Modal } fro
 import useAuth from "../../Hooks/useAuth";
 import AgentService from "../../services/agentService";
 import { styles } from "./style";
+import { AgentUpdate } from "../../interfaces/agentUpdate"; 
 
 const Curador = () => {
   const { user: currentUser } = useAuth();
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
-  const [config, setConfig] = useState<string>("{}");
+  const [systemPrompt, setSystemPrompt] = useState("");
   const [agents, setAgents] = useState<any[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [modalVisible, setModalVisible] = useState(false);
   const [editingAgent, setEditingAgent] = useState<any>(null);
 
-    // Fazer um map para ajustar os nomes dos campos
   const fetchAgents = async () => {
     try {
       const response = await AgentService.getAllAgents(1, 20);
@@ -24,9 +24,6 @@ const Curador = () => {
         agent_description: agent.description,
         agent_config: agent.config,
         status: agent.status,
-        created_by_user_id: agent.createdByUserId,
-        created_at: agent.createdAt,
-        updated_at: agent.updatedAt,
       }));
       setAgents(mappedAgents);
     } catch (error) {
@@ -45,12 +42,15 @@ const Curador = () => {
       const agentData = {
         Name: name,
         Description: description,
-        Config: JSON.parse(config),
+        Config: {
+          SystemPrompt: systemPrompt,
+          AllowedFileTypes: ["pdf"],
+        },
       };
       await AgentService.createAgent(agentData);
       setName("");
       setDescription("");
-      setConfig("{}");
+      setSystemPrompt("");
       Alert.alert("Sucesso", "Agente criado com sucesso!");
       fetchAgents();
     } catch (error) {
@@ -61,32 +61,39 @@ const Curador = () => {
 
   const openEditModal = (agent: any) => {
     setEditingAgent(agent);
-    setName(agent.agent_name || agent.name || "");
-    setDescription(agent.agent_description || agent.description || "");
-    setConfig(JSON.stringify(agent.agent_config || agent.config || {}));
+    setName(agent.agent_name || "");
+    setDescription(agent.agent_description || "");
+    setSystemPrompt(agent.agent_config?.SystemPrompt || "");
     setModalVisible(true);
   };
 
   const handleEdit = async () => {
-    if (!editingAgent) return;
-  
-    try {
-      const updatedAgent = {
-        agentId: editingAgent.agent_id, 
-        Name: name,
-        Description: description,
-        Config: JSON.parse(config),
-      };
-  
-      await AgentService.updateAgent(editingAgent.agent_id, updatedAgent); 
-      Alert.alert("Sucesso", "Agente atualizado com sucesso.");
-      fetchAgents();
-      setModalVisible(false);
-    } catch (error) {
-      console.error("Erro ao atualizar o agente:", error);
-      Alert.alert("Erro", "Não foi possível atualizar o agente.");
-    }
+  if (!editingAgent) return;
+
+  const updatedAgent: AgentUpdate = {
+    Name: name,
+    Description: description,
+    Config: {
+      SystemPrompt: systemPrompt.trim() || editingAgent?.agent_config?.SystemPrompt || "Prompt padrão",
+      AllowedFileTypes: ["pdf"],
+    },
   };
+
+  try {
+    await AgentService.updateAgent(editingAgent.agent_id, updatedAgent);
+    Alert.alert("Sucesso", "Agente atualizado com sucesso.");
+    fetchAgents();
+    setModalVisible(false); 
+  } catch (error) {
+    if (error instanceof Error) { 
+      console.error("Erro ao atualizar o agente:", error.message);
+      Alert.alert("Erro", "Não foi possível atualizar o agente.");
+    } else {
+      console.error("Erro inesperado:", error);
+      Alert.alert("Erro", "Ocorreu um erro inesperado.");
+    }
+  }
+};
 
   const handleDelete = async (id: number) => {
     if (!currentUser?.user_role || currentUser.user_role < 2) {
@@ -98,12 +105,17 @@ const Curador = () => {
       Alert.alert("Sucesso", "Agente deletado com sucesso!");
       fetchAgents();
     } catch (error) {
-      console.error(error);
-      Alert.alert("Erro", "Não foi possível deletar agente.");
+      if (error instanceof Error) {
+        console.error(error.message);
+        Alert.alert("Erro", "Não foi possível deletar agente.");
+      } else {
+        console.error("Erro inesperado:", error);
+        Alert.alert("Erro", "Ocorreu um erro inesperado.");
+      }
     }
   };
 
-  const filtered = agents.filter(a =>
+  const filtered = agents.filter((a) =>
     (a.agent_name || "").toLowerCase().includes((searchQuery || "").toLowerCase())
   );
 
@@ -128,9 +140,9 @@ const Curador = () => {
           />
           <TextInput
             style={styles.inputbd}
-            placeholder="Config (JSON)"
-            value={config}
-            onChangeText={setConfig}
+            placeholder="Prompt do Sistema"
+            value={systemPrompt}
+            onChangeText={setSystemPrompt}
             placeholderTextColor="#888"
             multiline
           />
@@ -138,8 +150,6 @@ const Curador = () => {
             <Text style={styles.botaoTexto}>Cadastrar</Text>
           </TouchableOpacity>
         </View>
-
-
         <View style={styles.containerVisualizar}>
           <Text style={styles.dadosText}>Visualizar Agentes</Text>
           <TextInput
@@ -149,20 +159,22 @@ const Curador = () => {
             onChangeText={setSearchQuery}
             placeholderTextColor="#888"
           />
-          {filtered.map((agent, index) => (
-            <View key={agent.agent_id ?? index} style={styles.agentCard}>
-              <Text style={styles.agentName}>{agent.agent_name}</Text>
-              <Text style={styles.agentDescription}>{agent.agent_description}</Text>
-              <View style={styles.agentActions}>
-                <TouchableOpacity style={styles.editButton} onPress={() => openEditModal(agent)}>
-                  <Text style={styles.buttonText}>Editar</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.deleteButton} onPress={() => handleDelete(agent.agent_id)}>
-                  <Text style={styles.buttonText}>Deletar</Text>
-                </TouchableOpacity>
+          <ScrollView style={{ maxHeight: 300 }} contentContainerStyle={{ flexGrow: 1 }} nestedScrollEnabled={true}>
+            {filtered.map((agent, index) => (
+              <View key={agent.agent_id ?? index} style={styles.agentCard}>
+                <Text style={styles.agentName}>{agent.agent_name}</Text>
+                <Text style={styles.agentDescription}>{agent.agent_description}</Text>
+                <View style={styles.agentActions}>
+                  <TouchableOpacity style={styles.editButton} onPress={() => openEditModal(agent)}>
+                    <Text style={styles.buttonText}>Editar</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity style={styles.deleteButton} onPress={() => handleDelete(agent.agent_id)}>
+                    <Text style={styles.buttonText}>Deletar</Text>
+                  </TouchableOpacity>
+                </View>
               </View>
-            </View>
-          ))}
+            ))}
+          </ScrollView>
         </View>
 
         <Modal visible={modalVisible} animationType="slide" transparent={true}>
@@ -185,9 +197,9 @@ const Curador = () => {
               />
               <TextInput
                 style={styles.inputbd}
-                value={config}
-                onChangeText={setConfig}
-                placeholder="Config (JSON)"
+                value={systemPrompt}
+                onChangeText={setSystemPrompt}
+                placeholder="Prompt do Sistema"
                 placeholderTextColor="#888"
                 multiline
               />

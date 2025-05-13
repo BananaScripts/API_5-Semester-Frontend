@@ -56,6 +56,8 @@ const Admin = () => {
       setEmail('');
       setPassword('');
       alert("Usuário criado com sucesso!");
+
+      await fetchUsers();
     } catch (error) {
       console.error("Error creating user:", error);
       alert("Erro ao criar o usuário.");
