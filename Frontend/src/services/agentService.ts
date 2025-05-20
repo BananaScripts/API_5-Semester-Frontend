@@ -51,6 +51,18 @@ const AgentService = {
       throw new Error("Error deleting agent: " + error);
     }
   },
+  async createAgentWithUpload(formData: FormData): Promise<any> {
+  try {
+    const response = await api.post(`/agent/agent`, formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+    return response.data;
+  } catch (error) {
+    throw new Error("Erro ao criar agente com upload: " + error);
+  }
+},
 };
 
 export default AgentService;

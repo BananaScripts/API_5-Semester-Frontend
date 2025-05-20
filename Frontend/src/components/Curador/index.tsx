@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from "react";
+import * as DocumentPicker from 'expo-document-picker';
 import { View, Text, TextInput, TouchableOpacity, ScrollView, Alert, Modal } from "react-native";
 import useAuth from "../../Hooks/useAuth";
 import AgentService from "../../services/agentService";
 import { styles } from "./style";
-import { AgentUpdate } from "../../interfaces/agentUpdate"; 
+import { AgentUpdate } from "../../interfaces/agentUpdate";
 
 const Curador = () => {
   const { user: currentUser } = useAuth();
@@ -14,6 +15,21 @@ const Curador = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [modalVisible, setModalVisible] = useState(false);
   const [editingAgent, setEditingAgent] = useState<any>(null);
+
+  const [selectedFile, setSelectedFile] = useState<any>(null);
+
+  const pickFile = async () => {
+    const result = await DocumentPicker.getDocumentAsync({
+      type: 'application/pdf',
+      copyToCacheDirectory: true,
+    });
+
+    if (!result.canceled && result.assets.length > 0) {
+      const file = result.assets[0];
+      setSelectedFile(file);
+    }
+  };
+
 
   const fetchAgents = async () => {
     try {
@@ -38,19 +54,31 @@ const Curador = () => {
   }, [currentUser]);
 
   const handleRegister = async () => {
+    if (!selectedFile) {
+      Alert.alert("Erro", "Por favor, selecione um arquivo PDF.");
+      return;
+    }
+
     try {
-      const agentData = {
-        Name: name,
-        Description: description,
-        Config: {
-          SystemPrompt: systemPrompt,
-          AllowedFileTypes: ["pdf"],
-        },
-      };
-      await AgentService.createAgent(agentData);
+      const fileResponse = await fetch(selectedFile.uri);
+      const fileBlob = await fileResponse.blob();
+
+      const formData = new FormData();
+      formData.append("Name", name);
+      formData.append("Description", description);
+      formData.append("Config", JSON.stringify({
+        SystemPrompt: systemPrompt,
+        AllowedFileTypes: ["pdf"],
+      }));
+      formData.append("File", fileBlob, selectedFile.name); 
+
+      await AgentService.createAgentWithUpload(formData);
+
       setName("");
       setDescription("");
       setSystemPrompt("");
+      setSelectedFile(null);
+
       Alert.alert("Sucesso", "Agente criado com sucesso!");
       fetchAgents();
     } catch (error) {
@@ -58,6 +86,8 @@ const Curador = () => {
       Alert.alert("Erro", "Não foi possível criar agente.");
     }
   };
+
+
 
   const openEditModal = (agent: any) => {
     setEditingAgent(agent);
@@ -68,32 +98,32 @@ const Curador = () => {
   };
 
   const handleEdit = async () => {
-  if (!editingAgent) return;
+    if (!editingAgent) return;
 
-  const updatedAgent: AgentUpdate = {
-    Name: name,
-    Description: description,
-    Config: {
-      SystemPrompt: systemPrompt.trim() || editingAgent?.agent_config?.SystemPrompt || "Prompt padrão",
-      AllowedFileTypes: ["pdf"],
-    },
-  };
+    const updatedAgent: AgentUpdate = {
+      Name: name,
+      Description: description,
+      Config: {
+        SystemPrompt: systemPrompt.trim() || editingAgent?.agent_config?.SystemPrompt || "Prompt padrão",
+        AllowedFileTypes: ["pdf"],
+      },
+    };
 
-  try {
-    await AgentService.updateAgent(editingAgent.agent_id, updatedAgent);
-    Alert.alert("Sucesso", "Agente atualizado com sucesso.");
-    fetchAgents();
-    setModalVisible(false); 
-  } catch (error) {
-    if (error instanceof Error) { 
-      console.error("Erro ao atualizar o agente:", error.message);
-      Alert.alert("Erro", "Não foi possível atualizar o agente.");
-    } else {
-      console.error("Erro inesperado:", error);
-      Alert.alert("Erro", "Ocorreu um erro inesperado.");
+    try {
+      await AgentService.updateAgent(editingAgent.agent_id, updatedAgent);
+      Alert.alert("Sucesso", "Agente atualizado com sucesso.");
+      fetchAgents();
+      setModalVisible(false);
+    } catch (error) {
+      if (error instanceof Error) {
+        console.error("Erro ao atualizar o agente:", error.message);
+        Alert.alert("Erro", "Não foi possível atualizar o agente.");
+      } else {
+        console.error("Erro inesperado:", error);
+        Alert.alert("Erro", "Ocorreu um erro inesperado.");
+      }
     }
-  }
-};
+  };
 
   const handleDelete = async (id: number) => {
     if (!currentUser?.user_role || currentUser.user_role < 2) {
@@ -146,6 +176,12 @@ const Curador = () => {
             placeholderTextColor="#888"
             multiline
           />
+          <TouchableOpacity style={styles.button} onPress={pickFile}>
+            <Text style={styles.botaoTexto}>
+              {selectedFile ? selectedFile.name : "Selecionar PDF"}
+            </Text>
+          </TouchableOpacity>
+
           <TouchableOpacity style={styles.button} onPress={handleRegister}>
             <Text style={styles.botaoTexto}>Cadastrar</Text>
           </TouchableOpacity>
