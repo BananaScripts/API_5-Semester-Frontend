@@ -4,6 +4,7 @@ import useAuth from "../../Hooks/useAuth";
 import AgentService from "../../services/agentService";
 import { styles } from "./style";
 import { AgentUpdate } from "../../interfaces/agentUpdate"; 
+import UserService from "../../services/userService";
 
 const Curador = () => {
   const { user: currentUser } = useAuth();
@@ -14,6 +15,8 @@ const Curador = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [modalVisible, setModalVisible] = useState(false);
   const [editingAgent, setEditingAgent] = useState<any>(null);
+  const [allUsers, setAllUsers] = useState<any[]>([]);
+  const [selectedUserIds, setSelectedUserIds] = useState<number[]>([]);
 
   const fetchAgents = async () => {
     try {
@@ -32,6 +35,18 @@ const Curador = () => {
     }
   };
   useEffect(() => {
+  const fetchUsers = async () => {
+    try {
+      const response = await UserService.getAllUsers(1, 100); // ajuste o limite conforme necessário
+      setAllUsers(response.items);
+    } catch (error) {
+      console.error("Erro ao buscar usuários:", error);
+    }
+  };
+
+  fetchUsers();
+}, []);
+  useEffect(() => {
     if (currentUser?.user_role && currentUser.user_role >= 1) {
       fetchAgents();
     }
@@ -45,8 +60,10 @@ const Curador = () => {
         Config: {
           SystemPrompt: systemPrompt,
           AllowedFileTypes: ["pdf"],
+          AllowedUserIds: selectedUserIds, 
         },
       };
+
       await AgentService.createAgent(agentData);
       setName("");
       setDescription("");
@@ -60,24 +77,28 @@ const Curador = () => {
   };
 
   const openEditModal = (agent: any) => {
-    setEditingAgent(agent);
-    setName(agent.agent_name || "");
-    setDescription(agent.agent_description || "");
-    setSystemPrompt(agent.agent_config?.SystemPrompt || "");
-    setModalVisible(true);
-  };
+  setEditingAgent(agent);
+  setName(agent.agent_name || "");
+  setDescription(agent.agent_description || "");
+  setSystemPrompt(agent.agent_config?.SystemPrompt || "");
+  setSelectedUserIds(agent.agent_config?.AllowedUserIds || []);
+  setModalVisible(true);
+};
+
 
   const handleEdit = async () => {
   if (!editingAgent) return;
 
   const updatedAgent: AgentUpdate = {
-    Name: name,
-    Description: description,
-    Config: {
-      SystemPrompt: systemPrompt.trim() || editingAgent?.agent_config?.SystemPrompt || "Prompt padrão",
-      AllowedFileTypes: ["pdf"],
-    },
-  };
+  Name: name,
+  Description: description,
+  Config: {
+    SystemPrompt: systemPrompt.trim() || editingAgent?.agent_config?.SystemPrompt || "Prompt padrão",
+    AllowedFileTypes: ["pdf"],
+    AllowedUserIds: selectedUserIds, 
+  },
+};
+
 
   try {
     await AgentService.updateAgent(editingAgent.agent_id, updatedAgent);
@@ -146,6 +167,35 @@ const Curador = () => {
             placeholderTextColor="#888"
             multiline
           />
+          <View>
+            <Text style={styles.dadosText}>Usuários Permitidos</Text>
+                <ScrollView style={{ maxHeight: 150 }}>
+                  {allUsers.map(user => (
+                    <TouchableOpacity
+                      key={user.id}
+                      style={{
+                        flexDirection: "row",
+                        alignItems: "center",
+                        marginVertical: 4,
+                      }}
+                      onPress={() => {
+                        setSelectedUserIds(prev => 
+                          prev.includes(user.id) 
+                            ? prev.filter(id => id !== user.id) 
+                            : [...prev, user.id]
+                        );
+                      }}
+                    >
+                      <View style={{
+                        width: 20, height: 20, marginRight: 8,
+                        borderWidth: 1, borderColor: "#ccc",
+                        backgroundColor: selectedUserIds.includes(user.id) ? "#0ff" : "#fff"
+                      }} />
+                      <Text style={{ color: "#fff" }}>{user.name} ({user.email})</Text>
+                    </TouchableOpacity>
+                  ))}
+                </ScrollView>
+              </View>
           <TouchableOpacity style={styles.button} onPress={handleRegister}>
             <Text style={styles.botaoTexto}>Cadastrar</Text>
           </TouchableOpacity>
