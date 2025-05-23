@@ -145,7 +145,6 @@ const Curador = () => {
   return (
     <ScrollView contentContainerStyle={styles.scrollContainer}>
       <View style={styles.container}>
-        {/* Cadastro */}
         <View style={styles.containerUsuario}>
           <Text style={styles.dadosText}>Cadastrar Agente</Text>
           <TextInput style={styles.input} placeholder="Nome" value={name} onChangeText={setName} placeholderTextColor="#888" />
@@ -179,7 +178,6 @@ const Curador = () => {
           </TouchableOpacity>
         </View>
 
-        {/* Visualização */}
         <View style={styles.containerVisualizar}>
           <Text style={styles.dadosText}>Visualizar Agentes</Text>
           <TextInput style={styles.input} placeholder="Pesquisar..." value={searchQuery} onChangeText={setSearchQuery} placeholderTextColor="#888" />
@@ -201,7 +199,6 @@ const Curador = () => {
           </ScrollView>
         </View>
 
-        {/* Modal de Edição */}
         <Modal visible={modalVisible} animationType="slide" transparent={true}>
           <View style={styles.modalContainer}>
             <View style={styles.modalContent}>
