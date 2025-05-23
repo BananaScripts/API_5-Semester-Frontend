@@ -7,4 +7,5 @@ export interface AgentCreate {
 export interface AgentConfig {
   SystemPrompt: string;
   AllowedFileTypes: string[];
+  AllowedUserIds: number[];
 }

@@ -11,12 +11,19 @@ const Curador = () => {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [systemPrompt, setSystemPrompt] = useState("");
+
+  const [editSystemPrompt, setEditSystemPrompt] = useState("");
+  const [editName, setEditName] = useState("");
+  const [editDescription, setEditDescription] = useState("");
+
+  const [selectedUserIdsCreate, setSelectedUserIdsCreate] = useState<number[]>([]);
+  const [selectedUserIdsEdit, setSelectedUserIdsEdit] = useState<number[]>([]);
+
   const [agents, setAgents] = useState<any[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [modalVisible, setModalVisible] = useState(false);
   const [editingAgent, setEditingAgent] = useState<any>(null);
   const [allUsers, setAllUsers] = useState<any[]>([]);
-  const [selectedUserIds, setSelectedUserIds] = useState<number[]>([]);
 
   const fetchAgents = async () => {
     try {
@@ -25,7 +32,11 @@ const Curador = () => {
         agent_id: agent.agentId,
         agent_name: agent.name,
         agent_description: agent.description,
-        agent_config: agent.config,
+        agent_config: {
+          ...agent.config,
+          SystemPrompt: agent.config?.SystemPrompt || agent.config?.systemPrompt || "",
+          AllowedUserIds: agent.config?.AllowedUserIds || [],
+        },
         status: agent.status,
       }));
       setAgents(mappedAgents);
@@ -34,18 +45,20 @@ const Curador = () => {
       Alert.alert("Erro", "Não foi possível carregar agentes.");
     }
   };
-  useEffect(() => {
-  const fetchUsers = async () => {
-    try {
-      const response = await UserService.getAllUsers(1, 100); // ajuste o limite conforme necessário
-      setAllUsers(response.items);
-    } catch (error) {
-      console.error("Erro ao buscar usuários:", error);
-    }
-  };
 
-  fetchUsers();
-}, []);
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const response = await UserService.getAllUsers(1, 100);
+        setAllUsers(response.items);
+      } catch (error) {
+        console.error("Erro ao buscar usuários:", error);
+      }
+    };
+
+    fetchUsers();
+  }, []);
+
   useEffect(() => {
     if (currentUser?.user_role && currentUser.user_role >= 1) {
       fetchAgents();
@@ -60,7 +73,7 @@ const Curador = () => {
         Config: {
           SystemPrompt: systemPrompt,
           AllowedFileTypes: ["pdf"],
-          AllowedUserIds: selectedUserIds, 
+          AllowedUserIds: selectedUserIdsCreate,
         },
       };
 
@@ -68,6 +81,7 @@ const Curador = () => {
       setName("");
       setDescription("");
       setSystemPrompt("");
+      setSelectedUserIdsCreate([]);
       Alert.alert("Sucesso", "Agente criado com sucesso!");
       fetchAgents();
     } catch (error) {
@@ -77,44 +91,37 @@ const Curador = () => {
   };
 
   const openEditModal = (agent: any) => {
-  setEditingAgent(agent);
-  setName(agent.agent_name || "");
-  setDescription(agent.agent_description || "");
-  setSystemPrompt(agent.agent_config?.SystemPrompt || "");
-  setSelectedUserIds(agent.agent_config?.AllowedUserIds || []);
-  setModalVisible(true);
-};
-
+    setEditingAgent(agent);
+    setEditName(agent.agent_name || "");
+    setEditDescription(agent.agent_description || "");
+    setEditSystemPrompt(agent.agent_config?.SystemPrompt || "");
+    setSelectedUserIdsEdit(agent.agent_config?.AllowedUserIds || []);
+    setModalVisible(true);
+  };
 
   const handleEdit = async () => {
-  if (!editingAgent) return;
+    if (!editingAgent) return;
 
-  const updatedAgent: AgentUpdate = {
-  Name: name,
-  Description: description,
-  Config: {
-    SystemPrompt: systemPrompt.trim() || editingAgent?.agent_config?.SystemPrompt || "Prompt padrão",
-    AllowedFileTypes: ["pdf"],
-    AllowedUserIds: selectedUserIds, 
-  },
-};
+    const updatedAgent: AgentUpdate = {
+      Name: editName,
+      Description: editDescription,
+      Config: {
+        SystemPrompt: editSystemPrompt.trim() || "Prompt padrão",
+        AllowedFileTypes: ["pdf"],
+        AllowedUserIds: selectedUserIdsEdit,
+      },
+    };
 
-
-  try {
-    await AgentService.updateAgent(editingAgent.agent_id, updatedAgent);
-    Alert.alert("Sucesso", "Agente atualizado com sucesso.");
-    fetchAgents();
-    setModalVisible(false); 
-  } catch (error) {
-    if (error instanceof Error) { 
-      console.error("Erro ao atualizar o agente:", error.message);
+    try {
+      await AgentService.updateAgent(editingAgent.agent_id, updatedAgent);
+      Alert.alert("Sucesso", "Agente atualizado com sucesso.");
+      fetchAgents();
+      setModalVisible(false);
+    } catch (error) {
+      console.error("Erro ao atualizar o agente:", error);
       Alert.alert("Erro", "Não foi possível atualizar o agente.");
-    } else {
-      console.error("Erro inesperado:", error);
-      Alert.alert("Erro", "Ocorreu um erro inesperado.");
     }
-  }
-};
+  };
 
   const handleDelete = async (id: number) => {
     if (!currentUser?.user_role || currentUser.user_role < 2) {
@@ -126,13 +133,8 @@ const Curador = () => {
       Alert.alert("Sucesso", "Agente deletado com sucesso!");
       fetchAgents();
     } catch (error) {
-      if (error instanceof Error) {
-        console.error(error.message);
-        Alert.alert("Erro", "Não foi possível deletar agente.");
-      } else {
-        console.error("Erro inesperado:", error);
-        Alert.alert("Erro", "Ocorreu um erro inesperado.");
-      }
+      console.error("Erro ao deletar agente:", error);
+      Alert.alert("Erro", "Não foi possível deletar agente.");
     }
   };
 
@@ -143,72 +145,44 @@ const Curador = () => {
   return (
     <ScrollView contentContainerStyle={styles.scrollContainer}>
       <View style={styles.container}>
+        {/* Cadastro */}
         <View style={styles.containerUsuario}>
           <Text style={styles.dadosText}>Cadastrar Agente</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Nome"
-            value={name}
-            onChangeText={setName}
-            placeholderTextColor="#888"
-          />
-          <TextInput
-            style={styles.input}
-            placeholder="Descrição"
-            value={description}
-            onChangeText={setDescription}
-            placeholderTextColor="#888"
-          />
-          <TextInput
-            style={styles.inputbd}
-            placeholder="Prompt do Sistema"
-            value={systemPrompt}
-            onChangeText={setSystemPrompt}
-            placeholderTextColor="#888"
-            multiline
-          />
-          <View>
-            <Text style={styles.dadosText}>Usuários Permitidos</Text>
-                <ScrollView style={{ maxHeight: 150 }}>
-                  {allUsers.map(user => (
-                    <TouchableOpacity
-                      key={user.id}
-                      style={{
-                        flexDirection: "row",
-                        alignItems: "center",
-                        marginVertical: 4,
-                      }}
-                      onPress={() => {
-                        setSelectedUserIds(prev => 
-                          prev.includes(user.id) 
-                            ? prev.filter(id => id !== user.id) 
-                            : [...prev, user.id]
-                        );
-                      }}
-                    >
-                      <View style={{
-                        width: 20, height: 20, marginRight: 8,
-                        borderWidth: 1, borderColor: "#ccc",
-                        backgroundColor: selectedUserIds.includes(user.id) ? "#0ff" : "#fff"
-                      }} />
-                      <Text style={{ color: "#fff" }}>{user.name} ({user.email})</Text>
-                    </TouchableOpacity>
-                  ))}
-                </ScrollView>
-              </View>
+          <TextInput style={styles.input} placeholder="Nome" value={name} onChangeText={setName} placeholderTextColor="#888" />
+          <TextInput style={styles.input} placeholder="Descrição" value={description} onChangeText={setDescription} placeholderTextColor="#888" />
+          <TextInput style={styles.inputbd} value={systemPrompt} onChangeText={setSystemPrompt} placeholder="Prompt do Sistema" placeholderTextColor="#888" multiline />
+          <Text style={styles.dadosText}>Usuários Permitidos</Text>
+          <ScrollView style={{ maxHeight: 150 }}>
+            {allUsers.map(user => (
+              <TouchableOpacity
+                key={user.id}
+                style={{ flexDirection: "row", alignItems: "center", marginVertical: 4 }}
+                onPress={() => {
+                  setSelectedUserIdsCreate(prev =>
+                    prev.includes(user.id)
+                      ? prev.filter(id => id !== user.id)
+                      : [...prev, user.id]
+                  );
+                }}
+              >
+                <View style={{
+                  width: 20, height: 20, marginRight: 8,
+                  borderWidth: 1, borderColor: "#ccc",
+                  backgroundColor: selectedUserIdsCreate.includes(user.id) ? "#0ff" : "#fff"
+                }} />
+                <Text style={{ color: "#fff" }}>{user.name} ({user.email})</Text>
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
           <TouchableOpacity style={styles.button} onPress={handleRegister}>
             <Text style={styles.botaoTexto}>Cadastrar</Text>
           </TouchableOpacity>
         </View>
+
+        {/* Visualização */}
         <View style={styles.containerVisualizar}>
           <Text style={styles.dadosText}>Visualizar Agentes</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Pesquisar..."
-            value={searchQuery}
-            onChangeText={setSearchQuery}
-            placeholderTextColor="#888"
-          />
+          <TextInput style={styles.input} placeholder="Pesquisar..." value={searchQuery} onChangeText={setSearchQuery} placeholderTextColor="#888" />
           <ScrollView style={{ maxHeight: 300 }} contentContainerStyle={{ flexGrow: 1 }} nestedScrollEnabled={true}>
             {filtered.map((agent, index) => (
               <View key={agent.agent_id ?? index} style={styles.agentCard}>
@@ -227,32 +201,37 @@ const Curador = () => {
           </ScrollView>
         </View>
 
+        {/* Modal de Edição */}
         <Modal visible={modalVisible} animationType="slide" transparent={true}>
           <View style={styles.modalContainer}>
             <View style={styles.modalContent}>
               <Text style={styles.modalTitle}>Editar Agente</Text>
-              <TextInput
-                style={styles.input}
-                value={name}
-                onChangeText={setName}
-                placeholder="Nome"
-                placeholderTextColor="#888"
-              />
-              <TextInput
-                style={styles.input}
-                value={description}
-                onChangeText={setDescription}
-                placeholder="Descrição"
-                placeholderTextColor="#888"
-              />
-              <TextInput
-                style={styles.inputbd}
-                value={systemPrompt}
-                onChangeText={setSystemPrompt}
-                placeholder="Prompt do Sistema"
-                placeholderTextColor="#888"
-                multiline
-              />
+              <TextInput style={styles.input} value={editName} onChangeText={setEditName} placeholder="Nome" placeholderTextColor="#888" />
+              <TextInput style={styles.input} value={editDescription} onChangeText={setEditDescription} placeholder="Descrição" placeholderTextColor="#888" />
+              <TextInput style={styles.inputbd} value={editSystemPrompt} onChangeText={setEditSystemPrompt} placeholder="Prompt do Sistema" placeholderTextColor="#888" multiline />
+              <Text style={styles.dadosText}>Usuários Permitidos</Text>
+              <ScrollView style={{ maxHeight: 150 }}>
+                {allUsers.map(user => (
+                  <TouchableOpacity
+                    key={user.id}
+                    style={{ flexDirection: "row", alignItems: "center", marginVertical: 4 }}
+                    onPress={() => {
+                      setSelectedUserIdsEdit(prev =>
+                        prev.includes(user.id)
+                          ? prev.filter(id => id !== user.id)
+                          : [...prev, user.id]
+                      );
+                    }}
+                  >
+                    <View style={{
+                      width: 20, height: 20, marginRight: 8,
+                      borderWidth: 1, borderColor: "#ccc",
+                      backgroundColor: selectedUserIdsEdit.includes(user.id) ? "#0ff" : "#fff"
+                    }} />
+                    <Text style={{ color: "#fff" }}>{user.name} ({user.email})</Text>
+                  </TouchableOpacity>
+                ))}
+              </ScrollView>
               <View style={styles.containerbotoes}>
                 <TouchableOpacity style={styles.button} onPress={handleEdit}>
                   <Text style={styles.botaoTexto}>Salvar</Text>
