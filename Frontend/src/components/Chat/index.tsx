@@ -5,8 +5,6 @@ import { styles } from "./style";
 import AgentService from "../../services/agentService";
 import useAuth from "../../Hooks/useAuth";
 
-const categories = ['faq', 'chatbot', 'tutorial'];
-
 type ChatScreenNavigationProp = {
   navigate: (screen: string, params: { bot: any }) => void;
 };
@@ -17,18 +15,19 @@ const Chat = () => {
   const [searchText, setSearchText] = useState("");
   const [agents, setAgents] = useState<any[]>([]);
   const [filteredAgents, setFilteredAgents] = useState<any[]>([]);
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
   const fetchAgents = async () => {
     try {
       const response = await AgentService.getAllAgents(1, 20);
-      const mappedAgents = response.items.map((agent: any) => ({
-        agent_id: agent.agentId,
-        agent_name: agent.name,
-        agent_description: agent.description,
-        agent_category: agent.config?.Category || 'chatbot', 
-        agent_image: require("../../../assets/botIcon.png"), 
-      }));
+      const mappedAgents = response.items
+        .filter((agent: any) => agent.agentId && agent.name && agent.description)
+        .map((agent: any) => ({
+          agentId: agent.agentId,
+          name: agent.name,
+          description: agent.description,
+          category: agent.config?.Category || 'chatbot',
+          image: require("../../../assets/bot01.png"),
+        }));
       setAgents(mappedAgents);
       setFilteredAgents(mappedAgents);
     } catch (error) {
@@ -43,20 +42,13 @@ const Chat = () => {
 
   const handleSearch = (text: string) => {
     setSearchText(text);
-    filterAgents(text, selectedCategory);
+    filterAgents(text);
   };
 
-  const handleCategoryPress = (category: string) => {
-    const newSelectedCategory = selectedCategory === category ? null : category;
-    setSelectedCategory(newSelectedCategory);
-    filterAgents(searchText, newSelectedCategory);
-  };
-
-  const filterAgents = (text: string, category: string | null) => {
+  const filterAgents = (text: string) => {
     const filtered = agents.filter(agent =>
-      (agent.agent_name.toLowerCase().includes(text.toLowerCase()) ||
-        agent.agent_description.toLowerCase().includes(text.toLowerCase())) &&
-      (!category || agent.agent_category === category)
+      agent.name.toLowerCase().includes(text.toLowerCase()) ||
+      agent.description.toLowerCase().includes(text.toLowerCase())
     );
     setFilteredAgents(filtered);
   };
@@ -78,18 +70,6 @@ const Chat = () => {
             value={searchText}
             onChangeText={handleSearch}
           />
-
-          <View style={styles.tagContainer}>
-            {categories.map(category => (
-              <TouchableOpacity
-                key={category}
-                style={[styles.tag, selectedCategory === category && styles.selectedTag]}
-                onPress={() => handleCategoryPress(category)}
-              >
-                <Text style={styles.tagText}>{category}</Text>
-              </TouchableOpacity>
-            ))}
-          </View>
         </View>
       </View>
 
@@ -97,11 +77,11 @@ const Chat = () => {
         <ScrollView style={styles.scrollContainer} contentContainerStyle={styles.scrollContent}>
           <View style={styles.gridContainer}>
             {filteredAgents.map((bot) => (
-              <TouchableOpacity key={bot.agent_id} style={styles.botCard} onPress={() => handleBotPress(bot)}>
-                <Image style={styles.botImage} source={bot.agent_image} />
+              <TouchableOpacity key={bot.agentId} style={styles.botCard} onPress={() => handleBotPress(bot)}>
+                <Image style={styles.botImage} source={bot.image} />
                 <View style={styles.botInfo}>
-                  <Text style={styles.botTitle}>{bot.agent_name} - {bot.agent_category}</Text>
-                  <Text style={styles.botDescription}>{bot.agent_description}</Text>
+                  <Text style={styles.botTitle}>{bot.name} - {bot.category}</Text>
+                  <Text style={styles.botDescription}>{bot.description}</Text>
                 </View>
               </TouchableOpacity>
             ))}

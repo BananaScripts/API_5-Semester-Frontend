@@ -106,22 +106,23 @@ export default function ChatScreen() {
       };
 
       ws.onmessage = (event) => {
-        try {
-          const response = JSON.parse(event.data);
-          console.log('Recebido:', response);
+  try {
+    const response = JSON.parse(event.data);
+    console.log('Recebido via WS:', response);
 
-          if (response.sender && response.text) {
-            setMessages((prev) => [
-              ...prev,
-              { sender: response.sender, text: response.text, timestamp: response.timestamp },
-            ]);
-          } else {
-            console.warn('Mensagem mal formatada recebida:', response);
-          }
-        } catch (error) {
-          console.error('Erro na mensagem:', error);
-        }
-      };
+    if (response.message) {
+      setMessages((prev) => [
+        ...prev,
+        { sender: 'bot', text: response.message, timestamp: new Date().toISOString() },
+      ]);
+    } else {
+      console.warn('Payload WS sem campo message:', response);
+    }
+  } catch (error) {
+    console.error('Erro parseando mensagem WebSocket:', error);
+  }
+};
+
 
       ws.onerror = (error) => {
         Alert.alert('Erro', 'Conexão WebSocket falhou');
@@ -158,7 +159,7 @@ export default function ChatScreen() {
     const messagePayload = {
       ChatId: chatId,
       UserId: String(userId),
-      AgentId: bot.agentId,
+      AgentId: String(bot.agentId),
       Text: inputText,
       Dev: true,
     };
@@ -211,6 +212,29 @@ export default function ChatScreen() {
       Alert.alert('Erro', 'Não foi possível fechar o chat');
     }
   };
+
+  const [agents, setAgents] = useState<any[]>([]);
+
+  // Mapeia agentes da API para o formato esperado
+  useEffect(() => {
+    const fetchAgents = async () => {
+      try {
+        const response = await api.get('/Agent');
+        const mappedAgents = response.data.items.map((agent: any) => ({
+          agent_id: agent.agentId,
+          agent_name: agent.name,
+          agent_description: agent.description,
+          agent_category: agent.config?.Category || 'chatbot',
+          agent_image: require("../../../assets/botIcon.png"),
+        }));
+        setAgents(mappedAgents);
+      } catch (error) {
+        console.error('Erro ao buscar agentes:', error);
+      }
+    };
+
+    fetchAgents();
+  }, []);
 
   if (loading) {
     return (
