@@ -75,6 +75,7 @@ export const styles = StyleSheet.create({
     borderRadius: 15,
     borderWidth: 1,
     borderColor: "#FFF",
+    height: '30%',
   },
   agentCard: {
     backgroundColor: "#2A2A2A",

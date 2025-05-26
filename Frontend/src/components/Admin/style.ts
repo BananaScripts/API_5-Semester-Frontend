@@ -10,7 +10,7 @@ export const styles = StyleSheet.create({
   },
   scrollContainer: {
     flexGrow: 1,
-    height: 1550,
+    height: 5080,
   },
   titulo: {
     color: "#92FFFF",  
@@ -28,7 +28,7 @@ export const styles = StyleSheet.create({
   dadosText: {
     color: "#FFF", 
     fontFamily: "JetBrainsMono",
-    fontSize: 18,  
+    fontSize: 14,  
     paddingBottom: 8,  
   },
   containerUsuario: {

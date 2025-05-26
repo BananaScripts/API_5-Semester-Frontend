@@ -1,8 +1,9 @@
-import api from './api'; // Certifique-se de que o caminho está correto
+import api from './api';
 import type { ImageSourcePropType } from 'react-native';
 
 export type Bot = {
   id: string;
+  agentId: number; // 👈 aqui
   name: string;
   descricao: string;
   category: string;
@@ -10,7 +11,6 @@ export type Bot = {
   response: (message: string) => string;
 };
 
-// Definição inline para a estrutura da resposta da API
 type AgentResponse = {
   agentId: number;
   name: string;
@@ -56,6 +56,7 @@ export async function getBots(
 
     return items.map((agent, index) => ({
       id: String(agent.agentId),
+      agentId: agent.agentId, // 👈 aqui
       name: agent.name,
       descricao: agent.description,
       category: String(agent.status),
@@ -70,3 +71,7 @@ export async function getBots(
     return [];
   }
 }
+
+export const getWebSocketUrl = (chatId: string) => {
+  return `ws://10.0.2.2:7254/ws/chat/open`;
+};
