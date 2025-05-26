@@ -51,7 +51,12 @@ export default function ChatScreen() {
   const wsRef = useRef<WebSocket | null>(null);
   const scrollViewRef = useRef<ScrollView>(null);
 
-  // Carrega histórico pelo chatId
+  const formatTime = (isoString: string | undefined) => {
+    if (!isoString) return '';
+    const date = new Date(isoString);
+    return `${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`;
+  };
+
   const loadChatHistory = useCallback(async (id: string) => {
     try {
       const response = await api.get(`/Chat/${id}`);
@@ -69,13 +74,11 @@ export default function ChatScreen() {
     }
   }, []);
 
-  // Inicializa chat, cria novo chat, carrega histórico e abre WebSocket
   const initializeChat = useCallback(async () => {
     try {
       const token = await AsyncStorage.getItem('token');
       if (!token) throw new Error('Token não encontrado');
 
-      // Cria novo chat na API
       const createRes = await api.post(
         '/Chat',
         `"${userId}"`,
@@ -90,38 +93,32 @@ export default function ChatScreen() {
       const newChatId = createRes.data.id;
       setChatId(newChatId);
 
-      // Carrega histórico
       await loadChatHistory(newChatId);
 
-      // Conecta WebSocket COM chatId na URL
       const wsUrl = getWebSocketUrl(newChatId);
       const ws = new WebSocket(wsUrl);
 
       ws.onopen = () => {
         console.log('🔥 Conexão WebSocket ON 🔥');
-        console.log('Conectando em:', wsUrl);
-        console.log('UserId:', userId);
-        console.log('AgentId:', bot.agentId);
         setIsConnected(true);
       };
 
       ws.onmessage = (event) => {
-        try {
-          const response = JSON.parse(event.data);
-          console.log('Recebido:', response);
+  try {
+    const response = JSON.parse(event.data);
+    console.log('Recebido via WS:', response);
+    if (response.message) {
+      const cleanText = response.message.replace(/\d{2}:\d{2}(:\d{2})?$/, '').trim();
+      setMessages((prev) => [
+        ...prev,
+        { sender: 'bot', text: cleanText, timestamp: new Date().toISOString() },
+      ]);
+    }
+  } catch (error) {
+    console.error('Erro parseando mensagem WebSocket:', error);
+  }
+};
 
-          if (response.sender && response.text) {
-            setMessages((prev) => [
-              ...prev,
-              { sender: response.sender, text: response.text, timestamp: response.timestamp },
-            ]);
-          } else {
-            console.warn('Mensagem mal formatada recebida:', response);
-          }
-        } catch (error) {
-          console.error('Erro na mensagem:', error);
-        }
-      };
 
       ws.onerror = (error) => {
         Alert.alert('Erro', 'Conexão WebSocket falhou');
@@ -132,18 +129,15 @@ export default function ChatScreen() {
     } catch (error: any) {
       console.error('Erro na inicialização:', error);
       Alert.alert('Erro', 'Falha ao iniciar chat');
-      if (navigation.canGoBack()) {
-        navigation.goBack();
-      }
+      if (navigation.canGoBack()) navigation.goBack();
     }
-  }, [userId, bot.agentId, loadChatHistory, navigation]);
+  }, [userId, loadChatHistory, navigation]);
 
   useEffect(() => {
     initializeChat();
     return () => wsRef.current?.close();
   }, [initializeChat]);
 
-  // Envia mensagem via WebSocket incluindo AgentId e ChatId no corpo JSON
   const handleSend = () => {
     if (
       !inputText.trim() ||
@@ -158,18 +152,20 @@ export default function ChatScreen() {
     const messagePayload = {
       ChatId: chatId,
       UserId: String(userId),
-      AgentId: bot.agentId,
+      AgentId: String(bot.agentId),
       Text: inputText,
       Dev: true,
     };
 
     console.log('Enviando:', JSON.stringify(messagePayload));
     wsRef.current.send(JSON.stringify(messagePayload));
-    setMessages((prev) => [...prev, { sender: 'user', text: inputText }]);
+    setMessages((prev) => [
+      ...prev,
+      { sender: 'user', text: inputText, timestamp: new Date().toISOString() },
+    ]);
     setInputText('');
   };
 
-  // Deleta chat
   const handleDeleteChat = async () => {
     if (!chatId) return;
     try {
@@ -184,34 +180,6 @@ export default function ChatScreen() {
     }
   };
 
-  // Reabre chat
-  const handleOpenChat = async () => {
-    if (!chatId) return;
-    try {
-      const token = await AsyncStorage.getItem('token');
-      await api.patch(`/Chat/${chatId}/open`, null, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      Alert.alert('Chat reaberto');
-    } catch {
-      Alert.alert('Erro', 'Não foi possível reabrir o chat');
-    }
-  };
-
-  // Fecha chat
-  const handleCloseChat = async () => {
-    if (!chatId) return;
-    try {
-      const token = await AsyncStorage.getItem('token');
-      await api.patch(`/Chat/${chatId}/close`, null, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      Alert.alert('Chat fechado');
-    } catch {
-      Alert.alert('Erro', 'Não foi possível fechar o chat');
-    }
-  };
-
   if (loading) {
     return (
       <View style={styles.container}>
@@ -223,7 +191,6 @@ export default function ChatScreen() {
 
   return (
     <View style={styles.container}>
-      {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
           <Ionicons name="arrow-back" size={24} color="white" />
@@ -235,7 +202,6 @@ export default function ChatScreen() {
         </TouchableOpacity>
       </View>
 
-      {/* Messages */}
       <ScrollView
         ref={scrollViewRef}
         style={styles.content}
@@ -247,11 +213,13 @@ export default function ChatScreen() {
             style={message.sender === 'user' ? styles.userMessage : styles.botMessage}
           >
             <Text style={styles.messageText}>{message.text}</Text>
+            {message.timestamp && (
+              <Text style={styles.timestampText}>{formatTime(message.timestamp)}</Text>
+            )}
           </View>
         ))}
       </ScrollView>
 
-      {/* Input */}
       <View style={styles.inputContainer}>
         <TextInput
           style={styles.input}

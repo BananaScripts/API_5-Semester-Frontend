@@ -106,4 +106,11 @@ export const styles = StyleSheet.create({
       color: '#888',
       textAlign: 'center',
     },
+    timestampText: {
+  fontSize: 10,
+  color: '#aaa',
+  marginTop: 4,
+  textAlign: 'right',
+},
+
 });
