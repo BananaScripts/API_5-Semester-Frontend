@@ -129,20 +129,34 @@ export default function ChatScreen() {
       };
 
       ws.onmessage = (event) => {
-        try {
-          const response = JSON.parse(event.data);
-          console.log('Recebido via WS:', response);
-          if (response.message) {
-            const sender: 'user' | 'bot' = response.user_id === userId ? 'user' : 'bot';
-            const cleanText = response.message.replace(/\d{2}:\d{2}(:\d{2})?$/, '').trim();
-            const newMsg: Message = { sender, text: cleanText, timestamp: new Date().toISOString() };
-            setMessages((prev) => [...prev, newMsg]);
-            addMessage(String(bot.agentId), newMsg);
-          }
-        } catch (error) {
-          console.error('Erro parseando mensagem WebSocket:', error);
-        }
-      };
+  try {
+    const response = JSON.parse(event.data);
+    console.log('Recebido via WS:', response);
+
+    if (response.error === 'user not allowed') {
+      Alert.alert('Acesso Negado', 'Você não tem permissão para continuar nesse chat.', [
+        { text: 'OK', onPress: () => navigation.goBack() },
+      ]);
+      ws.close();
+      return;
+    }
+
+    if (response.message) {
+      const sender: 'user' | 'bot' = response.user_id === userId ? 'user' : 'bot';
+      const cleanText = response.message
+        .replace(/\*/g, '')
+        .replace(/\d{2}:\d{2}(:\d{2})?$/, '')
+        .trim();
+
+      const newMsg: Message = { sender, text: cleanText, timestamp: new Date().toISOString() };
+      setMessages((prev) => [...prev, newMsg]);
+      addMessage(String(bot.agentId), newMsg);
+    }
+  } catch (error) {
+    console.error('Erro parseando mensagem WebSocket:', error);
+  }
+};
+
 
       ws.onerror = (error) => {
         Alert.alert('Erro', 'Conexão WebSocket falhou');

@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { View, Text, TextInput, Image, ScrollView, TouchableOpacity, Alert } from "react-native";
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { styles } from "./style";
 import AgentService from "../../services/agentService";
 import useAuth from "../../Hooks/useAuth";
@@ -39,6 +39,14 @@ const Chat = () => {
   useEffect(() => {
     if (currentUser) fetchAgents();
   }, [currentUser]);
+
+  useFocusEffect(
+    useCallback(() => {
+      if (currentUser) {
+        fetchAgents();
+      }
+    }, [currentUser])
+  );
 
   const handleSearch = (text: string) => {
     setSearchText(text);
