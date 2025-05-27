@@ -98,32 +98,34 @@ const Home = () => {
         </ScrollView>
       </View>
 
+      {/*
       <View style={styles.historico}>
         <Text style={styles.subtitulo}>Histórico de conversas</Text>
         
         <ScrollView style={styles.scrollContainer}>
           <View style={styles.containerHistorico}>
-            {chatHistory.map((bot: any) => {
-              // Ensure bot has a 'name' property for compatibility with Bot type
-              const botWithName: Bot = { 
-                id: bot.id, 
-                name: bot.name ?? bot.id, 
-                descricao: bot.descricao ?? "Sem descrição", 
-                image: bot.image ?? require("../../../assets/bot01.png")
-              };
-              return (
-                <TouchableOpacity key={botWithName.id} style={styles.agentesHistorico} onPress={() => handleBotPress(botWithName)}>
-                  <Image style={styles.imagemBotsHistorico} source={botWithName.image} />
-                  <View style={styles.botInfo}>
-                    <Text style={styles.subtitulo3}>{botWithName.id}</Text>
-                    <Text style={styles.subtitulo3}>{botWithName.descricao}</Text>
-                  </View>
-                </TouchableOpacity>
-              );
-            })}
+        {chatHistory.map((bot: any) => {
+          // Ensure bot has a 'name' property for compatibility with Bot type
+          const botWithName: Bot = { 
+            id: bot.id, 
+            name: bot.name ?? bot.id, 
+            descricao: bot.descricao ?? "Sem descrição", 
+            image: bot.image ?? require("../../../assets/bot01.png")
+          };
+          return (
+            <TouchableOpacity key={botWithName.id} style={styles.agentesHistorico} onPress={() => handleBotPress(botWithName)}>
+          <Image style={styles.imagemBotsHistorico} source={botWithName.image} />
+          <View style={styles.botInfo}>
+            <Text style={styles.subtitulo3}>{botWithName.id}</Text>
+            <Text style={styles.subtitulo3}>{botWithName.descricao}</Text>
+          </View>
+            </TouchableOpacity>
+          );
+        })}
           </View>
         </ScrollView>
       </View>
+      */}
     </View>
   );
 };

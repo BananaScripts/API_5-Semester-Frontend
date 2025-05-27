@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { View, Text, TextInput, Image, ScrollView, TouchableOpacity, Alert } from "react-native";
+import { View, Text, Image, ScrollView, TouchableOpacity, Alert } from "react-native";
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { styles } from "./style";
 import AgentService from "../../services/agentService";
 import useAuth from "../../Hooks/useAuth";
+import { useChatHistory } from "../../data/context/ChatHistoryContext";
 
 type ChatScreenNavigationProp = {
   navigate: (screen: string, params: { bot: any }) => void;
@@ -12,9 +13,8 @@ type ChatScreenNavigationProp = {
 const Chat = () => {
   const navigation = useNavigation<ChatScreenNavigationProp>();
   const { user: currentUser } = useAuth();
-  const [searchText, setSearchText] = useState("");
   const [agents, setAgents] = useState<any[]>([]);
-  const [filteredAgents, setFilteredAgents] = useState<any[]>([]);
+  const { addChatToHistory } = useChatHistory();
 
   const fetchAgents = async () => {
     try {
@@ -29,7 +29,6 @@ const Chat = () => {
           image: require("../../../assets/bot01.png"),
         }));
       setAgents(mappedAgents);
-      setFilteredAgents(mappedAgents);
     } catch (error) {
       console.error(error);
       Alert.alert("Erro", "Não foi possível carregar os chatbots.");
@@ -48,20 +47,9 @@ const Chat = () => {
     }, [currentUser])
   );
 
-  const handleSearch = (text: string) => {
-    setSearchText(text);
-    filterAgents(text);
-  };
-
-  const filterAgents = (text: string) => {
-    const filtered = agents.filter(agent =>
-      agent.name.toLowerCase().includes(text.toLowerCase()) ||
-      agent.description.toLowerCase().includes(text.toLowerCase())
-    );
-    setFilteredAgents(filtered);
-  };
-
   const handleBotPress = (bot: any) => {
+    const botWithSnippet = { ...bot, lastMessageSnippet: "Última mensagem..." };
+    addChatToHistory(botWithSnippet);
     navigation.navigate('ChatScreen', { bot });
   };
 
@@ -69,22 +57,10 @@ const Chat = () => {
     <View style={styles.container}>
       <Text style={styles.titulo}>Chatbots disponíveis</Text>
 
-      <View style={styles.searchAndTagsWrapper}>
-        <View style={styles.searchAndTagsContainer}>
-          <TextInput
-            style={styles.input}
-            placeholder="Buscar..."
-            placeholderTextColor="#888"
-            value={searchText}
-            onChangeText={handleSearch}
-          />
-        </View>
-      </View>
-
       <View style={styles.botsWrapper}>
         <ScrollView style={styles.scrollContainer} contentContainerStyle={styles.scrollContent}>
           <View style={styles.gridContainer}>
-            {filteredAgents.map((bot) => (
+            {agents.map((bot) => (
               <TouchableOpacity key={bot.agentId} style={styles.botCard} onPress={() => handleBotPress(bot)}>
                 <Image style={styles.botImage} source={bot.image} />
                 <View style={styles.botInfo}>

@@ -149,7 +149,14 @@ export default function ChatScreen() {
         .trim();
 
       const newMsg: Message = { sender, text: cleanText, timestamp: new Date().toISOString() };
-      setMessages((prev) => [...prev, newMsg]);
+      setMessages((prev) => [
+        ...prev,
+        {
+          sender: newMsg.sender as 'user' | 'bot',
+          text: newMsg.text,
+          timestamp: newMsg.timestamp,
+        },
+      ]);
       addMessage(String(bot.agentId), newMsg);
     }
   } catch (error) {

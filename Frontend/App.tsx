@@ -96,7 +96,7 @@ function MainTabs() {
     const tabs = [
       { name: "Perfil", component: Perfil },
       { name: "Chat", component: Chat },
-      { name: "Agentes", component: Agentes },
+      //{ name: "Agentes", component: Agentes },
       { name: "Home", component: Home },
     ];
 

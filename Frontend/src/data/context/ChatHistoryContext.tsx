@@ -1,9 +1,9 @@
 import React, { createContext, useState, useContext } from 'react';
-import { Bot } from '../bots/bots';
+import { BotWithLastMessage } from '../types/types';
 
 type ChatHistoryContextType = {
-  chatHistory: Bot[];
-  addChatToHistory: (bot: Bot) => void;
+  chatHistory: BotWithLastMessage[];
+  addChatToHistory: (bot: BotWithLastMessage) => void;
 };
 
 const ChatHistoryContext = createContext<ChatHistoryContextType | undefined>(undefined);
@@ -13,9 +13,9 @@ interface ChatHistoryProviderProps {
 }
 
 export const ChatHistoryProvider: React.FC<ChatHistoryProviderProps> = ({ children }) => {
-  const [chatHistory, setChatHistory] = useState<Bot[]>([]);
+  const [chatHistory, setChatHistory] = useState<BotWithLastMessage[]>([]);
 
-  const addChatToHistory = (bot: Bot) => {
+  const addChatToHistory = (bot: BotWithLastMessage) => {
     setChatHistory((prevHistory) => {
       const existingBot = prevHistory.find((b) => b.id === bot.id);
       if (existingBot) {
