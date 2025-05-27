@@ -23,6 +23,7 @@ import ChatIcon from './assets/icons/chat.svg';
 import AdminIcon from './assets/icons/admin.svg';
 import CuradorIcon from './assets/icons/curador.svg';
 import useAuth from './src/Hooks/useAuth'; 
+import { ChatMessageProvider } from './src/data/context/ChatMessageContext';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -47,6 +48,7 @@ export default function App() {
 
   return (
     <ChatHistoryProvider>
+      <ChatMessageProvider>
       <NavigationContainer>
         <Stack.Navigator>
           <Stack.Screen
@@ -81,6 +83,7 @@ export default function App() {
           />
         </Stack.Navigator>
       </NavigationContainer>
+      </ChatMessageProvider>
     </ChatHistoryProvider>
   );
 }

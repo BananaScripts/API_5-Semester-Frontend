@@ -17,6 +17,7 @@ import api from '../../services/api';
 import { Bot, getWebSocketUrl } from '../../services/chatService';
 import { useChatHistory } from '../../data/context/ChatHistoryContext';
 import { styles } from './style';
+import { useChatMessages } from '../../data/context/ChatMessageContext';
 import useAuth from '../../Hooks/useAuth';
 
 type RootStackParamList = {
@@ -41,6 +42,7 @@ export default function ChatScreen() {
   const { user } = useAuth();
   const userId = user?.user_id;
   const { addChatToHistory } = useChatHistory();
+  const { addMessage, getMessages, setMessages: setContextMessages } = useChatMessages();
 
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputText, setInputText] = useState('');
@@ -54,48 +56,71 @@ export default function ChatScreen() {
   const formatTime = (isoString: string | undefined) => {
     if (!isoString) return '';
     const date = new Date(isoString);
+    // Ajusta -3 horas manualmente
+    date.setHours(date.getHours() - 3);
     return `${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`;
   };
+
+  useEffect(() => {
+    if (!bot || !userId) return;
+    const existingMessages = getMessages(String(bot.agentId));
+    if (existingMessages.length > 0) {
+      setMessages(existingMessages);
+      setLoading(false);
+    }
+  }, [bot, userId, getMessages]);
 
   const loadChatHistory = useCallback(async (id: string) => {
     try {
       const response = await api.get(`/Chat/${id}`);
-      setMessages(
-        response.data.messages.map((msg: any) => ({
-          sender: msg.sender === 'user' ? 'user' : 'bot',
-          text: msg.text,
-          timestamp: msg.timestamp,
-        }))
-      );
+      const formattedMessages = response.data.messages.map((msg: any) => ({
+        sender: msg.sender === 'user' ? 'user' : 'bot',
+        text: msg.text,
+        timestamp: msg.timestamp,
+      }));
+      setMessages(formattedMessages);
+      setContextMessages(String(bot.agentId), formattedMessages);
     } catch (error) {
       console.warn('Histórico não carregado.');
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [bot.agentId, setContextMessages]);
 
   const initializeChat = useCallback(async () => {
     try {
       const token = await AsyncStorage.getItem('token');
       if (!token) throw new Error('Token não encontrado');
 
-      const createRes = await api.post(
-        '/Chat',
-        `"${userId}"`,
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const existingChatRes = await api.get(
+        `/Chat/user/${userId}/agent/${bot.agentId}`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      ).catch(() => null);
 
-      const newChatId = createRes.data.id;
-      setChatId(newChatId);
+      let activeChatId;
 
-      await loadChatHistory(newChatId);
+      if (existingChatRes && existingChatRes.data?.id) {
+        activeChatId = existingChatRes.data.id;
+        console.log('Chat existente encontrado:', activeChatId);
+      } else {
+        const createRes = await api.post(
+          '/Chat',
+          `"${userId}"`,
+          {
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        activeChatId = createRes.data.id;
+        console.log('Novo chat criado:', activeChatId);
+      }
 
-      const wsUrl = getWebSocketUrl(newChatId);
+      setChatId(activeChatId);
+      await loadChatHistory(activeChatId);
+
+      const wsUrl = getWebSocketUrl(activeChatId);
       const ws = new WebSocket(wsUrl);
 
       ws.onopen = () => {
@@ -104,21 +129,20 @@ export default function ChatScreen() {
       };
 
       ws.onmessage = (event) => {
-  try {
-    const response = JSON.parse(event.data);
-    console.log('Recebido via WS:', response);
-    if (response.message) {
-      const cleanText = response.message.replace(/\d{2}:\d{2}(:\d{2})?$/, '').trim();
-      setMessages((prev) => [
-        ...prev,
-        { sender: 'bot', text: cleanText, timestamp: new Date().toISOString() },
-      ]);
-    }
-  } catch (error) {
-    console.error('Erro parseando mensagem WebSocket:', error);
-  }
-};
-
+        try {
+          const response = JSON.parse(event.data);
+          console.log('Recebido via WS:', response);
+          if (response.message) {
+            const sender: 'user' | 'bot' = response.user_id === userId ? 'user' : 'bot';
+            const cleanText = response.message.replace(/\d{2}:\d{2}(:\d{2})?$/, '').trim();
+            const newMsg: Message = { sender, text: cleanText, timestamp: new Date().toISOString() };
+            setMessages((prev) => [...prev, newMsg]);
+            addMessage(String(bot.agentId), newMsg);
+          }
+        } catch (error) {
+          console.error('Erro parseando mensagem WebSocket:', error);
+        }
+      };
 
       ws.onerror = (error) => {
         Alert.alert('Erro', 'Conexão WebSocket falhou');
@@ -126,25 +150,23 @@ export default function ChatScreen() {
       };
 
       wsRef.current = ws;
+
     } catch (error: any) {
       console.error('Erro na inicialização:', error);
       Alert.alert('Erro', 'Falha ao iniciar chat');
       if (navigation.canGoBack()) navigation.goBack();
+    } finally {
+      setLoading(false);
     }
-  }, [userId, loadChatHistory, navigation]);
+  }, []);
 
   useEffect(() => {
     initializeChat();
     return () => wsRef.current?.close();
-  }, [initializeChat]);
+  }, []);
 
   const handleSend = () => {
-    if (
-      !inputText.trim() ||
-      !chatId ||
-      !wsRef.current ||
-      wsRef.current.readyState !== WebSocket.OPEN
-    ) {
+    if (!inputText.trim() || !chatId || !wsRef.current || wsRef.current.readyState !== WebSocket.OPEN) {
       Alert.alert('Erro', 'Conexão WebSocket não está ativa');
       return;
     }
@@ -154,30 +176,16 @@ export default function ChatScreen() {
       UserId: String(userId),
       AgentId: String(bot.agentId),
       Text: inputText,
-      Dev: true,
+      Dev: false,
     };
 
     console.log('Enviando:', JSON.stringify(messagePayload));
     wsRef.current.send(JSON.stringify(messagePayload));
-    setMessages((prev) => [
-      ...prev,
-      { sender: 'user', text: inputText, timestamp: new Date().toISOString() },
-    ]);
-    setInputText('');
-  };
 
-  const handleDeleteChat = async () => {
-    if (!chatId) return;
-    try {
-      const token = await AsyncStorage.getItem('token');
-      await api.delete(`/Chat/${chatId}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      Alert.alert('Chat deletado');
-      navigation.goBack();
-    } catch {
-      Alert.alert('Erro', 'Não foi possível deletar o chat');
-    }
+    const newMsg = { sender: 'user', text: inputText, timestamp: new Date().toISOString() };
+    setMessages((prev) => [...prev, newMsg]);
+    addMessage(bot.agentId, newMsg);
+    setInputText('');
   };
 
   if (loading) {
@@ -197,9 +205,7 @@ export default function ChatScreen() {
         </TouchableOpacity>
         <Image source={bot.image} style={styles.botImage} />
         <Text style={styles.botName}>{bot.name}</Text>
-        <TouchableOpacity onPress={handleDeleteChat} style={styles.deleteButton}>
-          <Ionicons name="trash" size={24} color="red" />
-        </TouchableOpacity>
+        {/* Removido o botão de deletar chat */}
       </View>
 
       <ScrollView
@@ -227,7 +233,7 @@ export default function ChatScreen() {
           placeholderTextColor="#888"
           value={inputText}
           onChangeText={setInputText}
-          onSubmitEditing={() => handleSend()}
+          onSubmitEditing={handleSend}
           editable={isConnected}
         />
         <TouchableOpacity onPress={handleSend} style={styles.sendButton} disabled={!isConnected}>
